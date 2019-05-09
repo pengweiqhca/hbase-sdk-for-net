@@ -9,46 +9,47 @@
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
+// Unless by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+syntax = "proto3";
 package org.apache.hadoop.hbase.rest.protobuf.generated;
 
 message Version {
-  optional string stargateVersion = 1;
-  optional string jvmVersion = 2;
-  optional string osVersion = 3;
-  optional string serverVersion = 4;
-  optional string jerseyVersion = 5;
+  string stargateVersion = 1;
+  string jvmVersion = 2;
+  string osVersion = 3;
+  string serverVersion = 4;
+  string jerseyVersion = 5;
 }
 
 message StorageClusterStatus {
   message Region {
-    required bytes name = 1;
-    optional int32 stores = 2;
-    optional int32 storefiles = 3;
-    optional int32 storefileSizeMB = 4;
-    optional int32 memstoreSizeMB = 5;
-    optional int32 storefileIndexSizeMB = 6;
+    bytes name = 1;
+    int32 stores = 2;
+    int32 storefiles = 3;
+    int32 storefileSizeMB = 4;
+    int32 memstoreSizeMB = 5;
+    int32 storefileIndexSizeMB = 6;
   }
   message Node {
-    required string name = 1;    // name:port
-    optional int64 startCode = 2;
-    optional int32 requests = 3;
-    optional int32 heapSizeMB = 4;
-    optional int32 maxHeapSizeMB = 5;
+    string name = 1;    // name:port
+    int64 startCode = 2;
+    int32 requests = 3;
+    int32 heapSizeMB = 4;
+    int32 maxHeapSizeMB = 5;
     repeated Region regions = 6;
   }
   // node status
   repeated Node liveNodes = 1;
   repeated string deadNodes = 2;
   // summary statistics
-  optional int32 regions = 3; 
-  optional int32 requests = 4; 
-  optional double averageLoad = 5;
+  int32 regions = 3;
+  int32 requests = 4;
+  double averageLoad = 5;
 }
 
 message TableList {
@@ -56,63 +57,67 @@ message TableList {
 }
 
 message TableInfo {
-  required string name = 1;
+  string name = 1;
   message Region {
-    required string name = 1;
-    optional bytes startKey = 2;
-    optional bytes endKey = 3;
-    optional int64 id = 4;
-    optional string location = 5;
+    string name = 1;
+    bytes startKey = 2;
+    bytes endKey = 3;
+    int64 id = 4;
+    string location = 5;
   }
   repeated Region regions = 2;
 }
 
 message TableSchema {
-  optional string name = 1;
+  string name = 1;
   message Attribute {
-    required string name = 1;
-    required string value = 2;
-  }  
+    string name = 1;
+    string value = 2;
+  }
   repeated Attribute attrs = 2;
   repeated ColumnSchema columns = 3;
-  // optional helpful encodings of commonly used attributes
-  optional bool inMemory = 4;
-  optional bool readOnly = 5;
+  // helpful encodings of commonly used attributes
+  bool inMemory = 4;
+  bool readOnly = 5;
 }
 
 message ColumnSchema {
-  optional string name = 1;
+  string name = 1;
   message Attribute {
-    required string name = 1;
-    required string value = 2;
+    string name = 1;
+    string value = 2;
   }
   repeated Attribute attrs = 2;
-  // optional helpful encodings of commonly used attributes
-  optional int32 ttl = 3;
-  optional int32 maxVersions = 4;
-  optional string compression = 5;
+  // helpful encodings of commonly used attributes
+  int32 ttl = 3;
+  int32 maxVersions = 4;
+  string compression = 5;
 }
 
 message Cell {
-  optional bytes row = 1;       // unused if Cell is in a CellSet
-  optional bytes column = 2;
-  optional int64 timestamp = 3;
-  optional bytes data = 4;
+  bytes row = 1;       // unused if Cell is in a CellSet
+  bytes column = 2;
+  int64 timestamp = 3;
+  bytes data = 4;
 }
 
 message CellSet {
   message Row {
-    required bytes key = 1;
+    bytes key = 1;
     repeated Cell values = 2;
   }
   repeated Row rows = 1;
 }
 
+message CellSets {
+	repeated CellSet sets = 1;
+}
+
 message Scanner {
-  optional bytes startRow = 1;
-  optional bytes endRow = 2;
+  bytes startRow = 1;
+  bytes endRow = 2;
   repeated bytes columns = 3;
-  optional int32 batch = 4;
-  optional int64 startTime = 5;
-  optional int64 endTime = 6;
+  int32 batch = 4;
+  int64 startTime = 5;
+  int64 endTime = 6;
 }

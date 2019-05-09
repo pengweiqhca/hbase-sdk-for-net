@@ -22,7 +22,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
     /// <summary>
     /// Equality comparer used in assertions.
     /// </summary>
-    /// <typeparam name = "T">
+    /// <typeparam Name = "T">
     /// The type of objects to compare.
     /// </typeparam>
     /// <remarks>
@@ -40,13 +40,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <returns>
         /// <c>true</c> if the specified objects are equal; otherwise, <c>false</c>.
         /// </returns>
-        /// <param name = "x">The first object of type <typeref name = "T" /> to compare.
+        /// <param Name = "x">The first object of type <typeref Name = "T" /> to compare.
         /// </param>
-        /// <param name = "y">The second object of type <typeref name = "T" /> to compare.
+        /// <param Name = "y">The second object of type <typeref Name = "T" /> to compare.
         /// </param>
         public bool Equals(T x, T y)
         {
-            Type type = typeof(T);
+            var type = typeof(T);
 
             // Null?
             if (!type.IsValueType || (type.IsGenericType && type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Nullable<>))))
@@ -89,13 +89,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
             if (enumerableX != null && enumerableY != null)
             {
-                IEnumerator enumeratorX = enumerableX.GetEnumerator();
-                IEnumerator enumeratorY = enumerableY.GetEnumerator();
+                var enumeratorX = enumerableX.GetEnumerator();
+                var enumeratorY = enumerableY.GetEnumerator();
 
                 while (true)
                 {
-                    bool hasNextX = enumeratorX.MoveNext();
-                    bool hasNextY = enumeratorY.MoveNext();
+                    var hasNextX = enumeratorX.MoveNext();
+                    var hasNextY = enumeratorY.MoveNext();
 
                     if (!hasNextX || !hasNextY)
                     {
@@ -119,7 +119,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <returns>
         /// A hash code for the specified object.
         /// </returns>
-        /// <param name = "obj">
+        /// <param Name = "obj">
         /// The <see cref = "T:System.Object" /> for which a hash code is to be returned.
         /// </param>
         public int GetHashCode(T obj)

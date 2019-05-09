@@ -24,7 +24,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Transforms a SecureString into a string.
         /// </summary>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The SecureString to transform.
         /// </param>
         /// <returns>
@@ -38,7 +38,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
             string rv;
-            IntPtr pointer = IntPtr.Zero;
+            var pointer = IntPtr.Zero;
             try
             {
                 pointer = Marshal.SecureStringToGlobalAllocUnicode(value);

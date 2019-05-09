@@ -46,10 +46,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Creates a new instance of a supplied type.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type to create an instance for.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameters to use when creating the type.
         /// </param>
         /// <returns>
@@ -57,8 +57,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// </returns>
         internal static object Create(this Type type, params object[] parameters)
         {
-            const BindingFlags BindingFlags = BindingFlags.CreateInstance | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-            return InternalDynaCreate(type, typeof(string), BindingFlags, parameters);
+            const BindingFlags bindingFlags = BindingFlags.CreateInstance | BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+            return InternalDynaCreate(type, typeof(string), bindingFlags, parameters);
         }
 
         /// <summary>
@@ -66,16 +66,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// reflection operation necessary to create a type dynamically given the type object
         /// that represents it.
         /// </summary>
-        /// <param name = "concreteType">
+        /// <param Name = "concreteType">
         /// The type of object to create.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to be supplied for any supplied parameter that has a null value.
         /// </param>
-        /// <param name = "bindings">
+        /// <param Name = "bindings">
         /// The Binding Flags to use when locating the constructor.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameters to use when calling the constructor.
         /// </param>
         /// <returns>
@@ -97,7 +97,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
             else
             {
-                string msg = "Unable to locate requested constructor for type {0}".FormatIc(concreteType.Name);
+                var msg = "Unable to locate requested constructor for type {0}".FormatIc(concreteType.Name);
                 throw new MissingMethodException(msg);
             }
         }
@@ -118,8 +118,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Performs an as operation on the supplied object.
         /// </summary>
-        /// <typeparam name="T"> The target type of the as operation. </typeparam>
-        /// <param name="inputValue"> The object. </param>
+        /// <typeparam Name="T"> The target type of the as operation. </typeparam>
+        /// <param Name="inputValue"> The object. </param>
         /// <returns> The result of the as operation. </returns>
         internal static T As<T>(this object inputValue) where T : class
         {
@@ -136,20 +136,20 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             Justification = "By design since we can ignore missing assemblies.  dps")]
         internal static IEnumerable<Type> FindKnownTypes()
         {
-            Assembly asm = Assembly.GetExecutingAssembly();
-            foreach (AssemblyName reference in asm.GetReferencedAssemblies())
+            var asm = Assembly.GetExecutingAssembly();
+            foreach (var reference in asm.GetReferencedAssemblies())
             {
                 Assembly.Load(reference.FullName);
             }
 
             var foundTypes = new List<Type>();
             var foundExtensions = new List<Type>();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 // ReSharper disable EmptyGeneralCatchClause
                 try
                 {
-                    foreach (Type type in assembly.GetTypes())
+                    foreach (var type in assembly.GetTypes())
                     {
                         foundTypes.Add(type);
                         if (type.IsSealed)
@@ -166,7 +166,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 catch (ReflectionTypeLoadException rtle)
                 {
                     // this can occur because a type in the assembly is decorated with: [StructLayout(LayoutKind.Explicit)]
-                    foreach (Type type in rtle.Types)
+                    foreach (var type in rtle.Types)
                     {
                         if (type.IsNull())
                         {
@@ -196,14 +196,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         /// <summary>
         /// Get's the value of a internal or non-internal property or field of an
-        /// object, when supplied by name.
+        /// object, when supplied by Name.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object from which the Field or Property should
         /// be returned.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to retrieve.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to retrieve.
         /// </param>
         /// <returns>
         /// The value of the Field or Property.
@@ -219,13 +219,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         /// <summary>
         /// Get's the value of a static internal or non-internal property or field of an
-        /// type, when supplied by name.
+        /// type, when supplied by Name.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type from which the Field or Property should be returned.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to retrieve.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to retrieve.
         /// </param>
         /// <returns>
         /// The value of the Field or Property.
@@ -237,14 +237,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         /// <summary>
         /// Get's the value of a internal or non-internal property or field of an
-        /// object, when supplied by name.
+        /// object, when supplied by Name.
         /// </summary>
-        /// <param name = "expando">
+        /// <param Name = "expando">
         /// The instance object from which the Field or Property should
         /// be returned.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to retrieve.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to retrieve.
         /// </param>
         /// <returns>
         /// The value of the Field or Property.
@@ -263,13 +263,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes an Instance Method on a supplied object.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -283,16 +283,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes an Instance Method on a supplied object.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to use if a parameter is null.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -305,9 +305,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("instance");
             }
 
-            const BindingFlags Bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            Type type = instance.GetType();
-            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, Bindings, parameters, null);
+            const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var type = instance.GetType();
+            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, bindings, parameters, null);
 
             if (bestMatch != null)
             {
@@ -320,16 +320,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a Generic Method with the supplied type Parameters and Argument Parameters.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "typeParameters">
+        /// <param Name = "typeParameters">
         /// The type parameters to use for the Generic Method.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -343,19 +343,19 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a Generic Method with the supplied type Parameters and Argument Parameters.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "typeParameters">
+        /// <param Name = "typeParameters">
         /// The type parameters to use for the Generic Method.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to use if a parameter is null.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -367,14 +367,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             {
                 throw new ArgumentNullException("instance");
             }
-            const BindingFlags Bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            Type type = instance.GetType();
+            const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            var type = instance.GetType();
 
-            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, Bindings, parameters, null);
+            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, bindings, parameters, null);
 
             if (bestMatch != null)
             {
-                MethodInfo generic = bestMatch.MakeGenericMethod(typeParameters);
+                var generic = bestMatch.MakeGenericMethod(typeParameters);
                 return InternalDynaInvoke(generic, parameters, instance);
             }
 
@@ -384,13 +384,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a static Method on a type.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -404,16 +404,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a static Method on a type.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The Type on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to use if a parameter is null.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -421,8 +421,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// </returns>
         internal static object Invoke(this Type type, string methodName, Type nullType, params object[] parameters)
         {
-            const BindingFlags Bindings = BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, Bindings, parameters, null);
+            const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, bindings, parameters, null);
 
             if (bestMatch != null)
             {
@@ -435,16 +435,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a static Generic Method with the supplied type Parameters and Argument Parameters.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "typeParameters">
+        /// <param Name = "typeParameters">
         /// The type parameters to use for the Generic Method.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -458,19 +458,19 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Invokes a static Generic Method with the supplied type Parameters and Argument Parameters.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type on which the method should be invoked.
         /// </param>
-        /// <param name = "methodName">
-        /// The name of the Method to invoke.
+        /// <param Name = "methodName">
+        /// The Name of the Method to invoke.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to use if a parameter is null.
         /// </param>
-        /// <param name = "typeParameters">
+        /// <param Name = "typeParameters">
         /// The type parameters to use for the Generic Method.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameter objects to supply to the method.
         /// </param>
         /// <returns>
@@ -478,13 +478,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// </returns>
         internal static object Invoke(this Type type, string methodName, Type nullType, Type[] typeParameters, params object[] parameters)
         {
-            const BindingFlags Bindings = BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+            const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
-            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, Bindings, parameters, typeParameters);
+            var bestMatch = LocateBestMatch<MethodInfo>(type, methodName, nullType, bindings, parameters, typeParameters);
 
             if (bestMatch != null)
             {
-                MethodInfo generic = bestMatch.MakeGenericMethod(typeParameters);
+                var generic = bestMatch.MakeGenericMethod(typeParameters);
                 return InternalDynaInvoke(generic, parameters, null);
             }
 
@@ -494,8 +494,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Evaluates type compatibility.
         /// </summary>
-        /// <typeparam name="T"> The type to evaluate against. </typeparam>
-        /// <param name="inputValue"> The object to evaluate compatibility for. </param>
+        /// <typeparam Name="T"> The type to evaluate against. </typeparam>
+        /// <param Name="inputValue"> The object to evaluate compatibility for. </param>
         /// <returns> True if the object is compatible otherwise false. </returns>
         internal static bool Is<T>(this object inputValue)
         {
@@ -510,7 +510,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// The extended set of primitives includes the set of actual
         /// primitives.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to be evaluated.
         /// </param>
         /// <returns>
@@ -529,7 +529,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines if a type is a floating point type.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to evaluate.
         /// </param>
         /// <returns>
@@ -543,7 +543,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines if a type is an integer type.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to evaluate.
         /// </param>
         /// <returns>
@@ -557,7 +557,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines whether the specified object is not null.
         /// </summary>
-        /// <param name="inputValue"> The object. </param>
+        /// <param Name="inputValue"> The object. </param>
         /// <returns>
         /// <c>true</c> if the specified object is not null; otherwise, <c>false</c> .
         /// </returns>
@@ -569,7 +569,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines whether the specified object is null.
         /// </summary>
-        /// <param name="inputValue"> The object. </param>
+        /// <param Name="inputValue"> The object. </param>
         /// <returns>
         /// <c>true</c> if the specified object is null; otherwise, <c>false</c> .
         /// </returns>
@@ -581,7 +581,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines if a type is a numeric type.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to evaluate.
         /// </param>
         /// <returns>
@@ -595,7 +595,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines whether [is params parameter] [the specified parameter info].
         /// </summary>
-        /// <param name="parameterInfo">The parameter info.</param>
+        /// <param Name="parameterInfo">The parameter info.</param>
         /// <returns>
         ///   <c>true</c> if [is params parameter] [the specified parameter info]; otherwise, <c>false</c>.
         /// </returns>
@@ -612,7 +612,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines if a type is a signed type.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to evaluate.
         /// </param>
         /// <returns>
@@ -626,7 +626,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Determines if the type is an unsigned type.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The type to evaluate.
         /// </param>
         /// <returns>
@@ -638,15 +638,15 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Sets any internal or non-internal property or field by name.
+        /// Sets any internal or non-internal property or field by Name.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance of the object.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to set.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to set.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to be set.
         /// </param>
         internal static void Set(this object instance, string name, object value)
@@ -659,15 +659,15 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Sets any internal or non-internal property or field by name.
+        /// Sets any internal or non-internal property or field by Name.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type for which the static property will be set.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to set.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to set.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to be set.
         /// </param>
         internal static void Set(this Type type, string name, object value)
@@ -676,15 +676,15 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Sets any internal or non-internal property or field by name.
+        /// Sets any internal or non-internal property or field by Name.
         /// </summary>
-        /// <param name = "expando">
+        /// <param Name = "expando">
         /// The instance of the object.
         /// </param>
-        /// <param name = "name">
-        /// The name of the Field or Property to set.
+        /// <param Name = "Name">
+        /// The Name of the Field or Property to set.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to be set.
         /// </param>
         internal static void Set(this IDictionary<string, object> expando, string name, object value)
@@ -695,10 +695,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Returns the substring that occurs after a given string.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The string to parse.
         /// </param>
-        /// <param name="searchValue">
+        /// <param Name="searchValue">
         /// The string to look for within the string to parse.
         /// </param>
         /// <returns>
@@ -711,7 +711,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             {
                 throw new ArgumentNullException("inputValue");
             }
-            int loc = inputValue.IndexOfOi(searchValue);
+            var loc = inputValue.IndexOfOi(searchValue);
             if (loc >= 0 && loc < inputValue.Length + 1)
             {
                 return inputValue.Substring(loc + 1);
@@ -723,10 +723,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Returns the substring that occurs before a given string.
         /// </summary>
-        /// <param name="inputValue">
+        /// <param Name="inputValue">
         /// The string to parse.
         /// </param>
-        /// <param name="searchValue">
+        /// <param Name="searchValue">
         /// The string to look for within the string to parse.
         /// </param>
         /// <returns>
@@ -740,7 +740,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("inputValue");
             }
 
-            int loc = inputValue.IndexOfOi(searchValue);
+            var loc = inputValue.IndexOfOi(searchValue);
             if (loc >= 0)
             {
                 return inputValue.Substring(0, loc);
@@ -754,18 +754,18 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// Determines the compatibility of a match between a set of supplied
         /// parameters and a set of possible parameters for an overloaded function.
         /// </summary>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// A set of ParameterInfo objects representing the available parameters
         /// for an overload of a method.
         /// </param>
-        /// <param name = "values">
+        /// <param Name = "values">
         /// A set of objects representing a intended set of values to be supplied to
         /// an overload for an object.
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type that should be used if one of the parameters are null.
         /// </param>
-        /// <param name="typeParameters">
+        /// <param Name="typeParameters">
         /// The type parameters for a generic method.
         /// </param>
         /// <returns>
@@ -779,30 +779,30 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             TestHelp.DoNothing(typeParameters);
 
-            int paramCount = parameters?.Count() ?? 0;
-            int objCount = values?.Count() ?? 0;
+            var paramCount = parameters?.Count() ?? 0;
+            var objCount = values?.Count() ?? 0;
             if (paramCount == 0 && objCount == 0)
             {
                 return int.MaxValue;
             }
 
-            int max = Math.Max(paramCount, objCount);
-            int retval = 0;
+            var max = Math.Max(paramCount, objCount);
+            var retval = 0;
             ParameterInfo paramsParameter = null;
-            for (int i = 0; i < max; i++)
+            for (var i = 0; i < max; i++)
             {
                 if (i < paramCount && i < objCount)
                 {
-                    ParameterInfo info = parameters[i];
+                    var info = parameters[i];
                     if (info.GetCustomAttributes(true).Where(a => a.GetType().IsAssignableFrom(typeof(ParamArrayAttribute))).Count() > 0)
                     {
                         paramsParameter = info;
                     }
 
-                    Type infoType = info.ParameterType;
+                    var infoType = info.ParameterType;
 
-                    object obj = values[i];
-                    Type objType = nullType;
+                    var obj = values[i];
+                    var objType = nullType;
 
                     if (obj != null)
                     {
@@ -819,7 +819,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                     // Check to see if method parameter is of type T.
                     if (infoType.IsGenericParameter)
                     {
-                        Type[] genericParameterConstraints = infoType.GetGenericParameterConstraints();
+                        var genericParameterConstraints = infoType.GetGenericParameterConstraints();
 
                         if (genericParameterConstraints.Count() == 0 ||
                             genericParameterConstraints.Any(constraint => constraint.IsAssignableFrom(objType)))
@@ -829,11 +829,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                     }
                     else if (infoType.IsArray && objType.IsArray)
                     {
-                        Type infoElementType = infoType.GetElementType();
-                        Type objElementType = objType.GetElementType();
+                        var infoElementType = infoType.GetElementType();
+                        var objElementType = objType.GetElementType();
                         if (infoElementType.ContainsGenericParameters)
                         {
-                            Type[] genericParameterConstraints = infoElementType.GetGenericParameterConstraints();
+                            var genericParameterConstraints = infoElementType.GetGenericParameterConstraints();
 
                             if (genericParameterConstraints.Count() == 0 ||
                                 genericParameterConstraints.Any(constraint => constraint.IsAssignableFrom(objElementType)))
@@ -844,11 +844,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                     }
                     else if (infoType.IsArray && paramsParameter.IsNotNull())
                     {
-                        Type infoElementType = infoType.GetElementType();
-                        Type objElementType = objType;
+                        var infoElementType = infoType.GetElementType();
+                        var objElementType = objType;
                         if (infoElementType.ContainsGenericParameters)
                         {
-                            Type[] genericParameterConstraints = infoElementType.GetGenericParameterConstraints();
+                            var genericParameterConstraints = infoElementType.GetGenericParameterConstraints();
 
                             if (genericParameterConstraints.Count() == 0 ||
                                 genericParameterConstraints.Any(constraint => constraint.IsAssignableFrom(objElementType)))
@@ -908,17 +908,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
 
         /// <summary>
-        /// Get's a Field or Property value from an object or type given the name of the desired
+        /// Get's a Field or Property value from an object or type given the Name of the desired
         /// Property or Field.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type for which the static property will be returned.
         /// </param>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object from which the property should be requested.
         /// </param>
-        /// <param name = "name">
-        /// The name of the property or field.
+        /// <param Name = "Name">
+        /// The Name of the property or field.
         /// </param>
         /// <returns>
         /// The value of the property or field.
@@ -930,16 +930,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 return Get(instance.As<IDictionary<string, object>>(), name);
             }
 
-            BindingFlags staticOrInstance = instance.IsNull() ? BindingFlags.Static : BindingFlags.Instance;
-            BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | staticOrInstance;
-            MemberInfo info = type.GetMember(name, bindings | BindingFlags.GetField | BindingFlags.GetProperty).FirstOrDefault();
+            var staticOrInstance = instance.IsNull() ? BindingFlags.Static : BindingFlags.Instance;
+            var bindings = BindingFlags.Public | BindingFlags.NonPublic | staticOrInstance;
+            var info = type.GetMember(name, bindings | BindingFlags.GetField | BindingFlags.GetProperty).FirstOrDefault();
 
             if (info == null)
             {
                 throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, "The member {0} does not exist", name));
             }
 
-            Type infoType = info.GetType();
+            var infoType = info.GetType();
 
             if (infoType.Is<PropertyInfo>())
             {
@@ -958,11 +958,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// Get's a internal or non-internal property of an object given
         /// the PropertyInfo for the desired property.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance of the object for which the property value is
         /// desired.
         /// </param>
-        /// <param name = "property">
+        /// <param Name = "property">
         /// The property desired.
         /// </param>
         /// <returns>
@@ -970,7 +970,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// </returns>
         private static object Get(object instance, PropertyInfo property)
         {
-            object retval = property.GetValue(instance, null);
+            var retval = property.GetValue(instance, null);
             return retval;
         }
 
@@ -978,10 +978,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// Get's a Field value for an object give the FieldInfo for the
         /// desired field.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The instance object for which the field value is desired.
         /// </param>
-        /// <param name = "field">
+        /// <param Name = "field">
         /// The FieldInfo object for the desired field.
         /// </param>
         /// <returns>
@@ -996,9 +996,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// Dynamically Invokes either a constructor, instance or static method as supplied with the
         /// provided arguments an instance as appropriate.
         /// </summary>
-        /// <param name = "method">The method to invoke.</param>
-        /// <param name = "parameters">The parameters to use.</param>
-        /// <param name = "instance">The instance to invoke the method against if it is an instance method.</param>
+        /// <param Name = "method">The method to invoke.</param>
+        /// <param Name = "parameters">The parameters to use.</param>
+        /// <param Name = "instance">The instance to invoke the method against if it is an instance method.</param>
         /// <returns>The results of the instance invocation.</returns>
         private static object InternalDynaInvoke(MethodBase method, object[] parameters, object instance = null)
         {
@@ -1029,7 +1029,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
                 // Use reflections to get the inner field that holds the stack inside
                 // of an exception.
-                FieldInfo remoteStackTrace = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
+                var remoteStackTrace = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
 
                 // Set the InnerException._remoteStackTraceString
                 // to the current InnerException.StackTrace
@@ -1045,25 +1045,25 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Locates the best match overload to utilize given a set of method call arguments.
         /// </summary>
-        /// <typeparam name = "T">
+        /// <typeparam Name = "T">
         /// The type of objects to return, this should be either MethodInfo or ConstructorInfo.
         /// </typeparam>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type for which the method should be located.
         /// </param>
-        /// <param name = "name">
-        /// The name of the method to locate (can be null for constructors).
+        /// <param Name = "Name">
+        /// The Name of the method to locate (can be null for constructors).
         /// </param>
-        /// <param name = "nullType">
+        /// <param Name = "nullType">
         /// The type to "assume" for any inbound parameter that is null.
         /// </param>
-        /// <param name = "bindings">
+        /// <param Name = "bindings">
         /// The BindingFlags to use when locating methods.
         /// </param>
-        /// <param name = "parameters">
+        /// <param Name = "parameters">
         /// The parameters to use when locating methods overloads.
         /// </param>
-        /// <param name="typeParameters">
+        /// <param Name="typeParameters">
         /// The type Parameters to be used with a generic method.
         /// </param>
         /// <returns>
@@ -1077,30 +1077,30 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             IEnumerable<T> extensions = null;
             if (typeof(MethodInfo).IsAssignableFrom(typeof(T)))
             {
-                IEnumerable<MethodInfo> methods = type.GetMethods(bindings).Where(x => x.Name == name);
-                IEnumerable<MethodInfo> extensionMethods =
+                var methods = type.GetMethods(bindings).Where(x => x.Name == name);
+                var extensionMethods =
                     ExtensionTypes.SelectMany(t => t.GetMethods()).Where(m => m.IsDefined(typeof(ExtensionAttribute), true));
-                IEnumerable<MethodInfo> sameNamedExtensionMethods = extensionMethods.Where(m => m.Name == name);
+                var sameNamedExtensionMethods = extensionMethods.Where(m => m.Name == name);
                 extensions = sameNamedExtensionMethods.Where(m => m.GetParameters()[0].ParameterType.IsAssignableFrom(type)).Cast<T>();
 
                 infos = methods.Cast<T>();
             }
             else if (typeof(ConstructorInfo).IsAssignableFrom(typeof(T)))
             {
-                ConstructorInfo[] constructors = type.GetConstructors(bindings);
+                var constructors = type.GetConstructors(bindings);
                 infos = constructors.Cast<T>();
             }
 
             T bestMatch = null;
-            int bestScore = 0;
+            var bestScore = 0;
 
             // Attempt the find the best match for the method.
-            foreach (T info in infos)
+            foreach (var info in infos)
             {
                 // This is used to "score" the best constructor to call.
                 // This avoids unnecessary ambiguity errors when multiple members
                 // "could work".
-                int score = CompareTypeAssignments(info.GetParameters(), parameters, nullType, typeParameters);
+                var score = CompareTypeAssignments(info.GetParameters(), parameters, nullType, typeParameters);
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -1111,12 +1111,12 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             // If no match, try to find a match from an extension method.
             if (bestMatch.IsNull() && extensions.IsNotNull() && typeof(MethodInfo).IsAssignableFrom(typeof(T)))
             {
-                foreach (T info in extensions)
+                foreach (var info in extensions)
                 {
                     // This is used to "score" the best constructor to call.
                     // This avoids unnecessary ambiguity errors when multiple members
                     // "could work".
-                    int score = CompareTypeAssignments(info.GetParameters().Skip(1).ToArray(), parameters, nullType, null);
+                    var score = CompareTypeAssignments(info.GetParameters().Skip(1).ToArray(), parameters, nullType, null);
                     if (score > bestScore)
                     {
                         bestScore = score;
@@ -1131,16 +1131,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Sets an instance or a static property or field on a type or object.
         /// </summary>
-        /// <param name = "type">
+        /// <param Name = "type">
         /// The type for which the static property will be set.
         /// </param>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// An instance of the type on which to set an instance value.
         /// </param>
-        /// <param name = "name">
-        /// The name of the value to set.
+        /// <param Name = "Name">
+        /// The Name of the value to set.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to assign.
         /// </param>
         private static void Set(Type type, object instance, string name, object value)
@@ -1151,16 +1151,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 return;
             }
 
-            BindingFlags staticOrInstance = instance.IsNull() ? BindingFlags.Static : BindingFlags.Instance;
-            BindingFlags bindings = BindingFlags.Public | BindingFlags.NonPublic | staticOrInstance;
-            MemberInfo info = type.GetMember(name, bindings | BindingFlags.GetField | BindingFlags.GetProperty).FirstOrDefault();
+            var staticOrInstance = instance.IsNull() ? BindingFlags.Static : BindingFlags.Instance;
+            var bindings = BindingFlags.Public | BindingFlags.NonPublic | staticOrInstance;
+            var info = type.GetMember(name, bindings | BindingFlags.GetField | BindingFlags.GetProperty).FirstOrDefault();
 
             if (info == null)
             {
                 throw new MissingMemberException(string.Format(CultureInfo.InvariantCulture, "The member {0} does not exist", name));
             }
 
-            Type infoType = info.GetType();
+            var infoType = info.GetType();
 
             if (infoType.Is<PropertyInfo>())
             {
@@ -1179,13 +1179,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Modifies a given property inside of an instantiated object.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The object for which the property should be altered.
         /// </param>
-        /// <param name = "property">
+        /// <param Name = "property">
         /// The property to change.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to set the property to.
         /// </param>
         private static void Set(object instance, PropertyInfo property, object value)
@@ -1196,13 +1196,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Modifies a given property inside of an instantiated object.
         /// </summary>
-        /// <param name = "instance">
+        /// <param Name = "instance">
         /// The object for which the property should be altered.
         /// </param>
-        /// <param name = "field">
+        /// <param Name = "field">
         /// The field to change.
         /// </param>
-        /// <param name = "value">
+        /// <param Name = "value">
         /// The value to set the property to.
         /// </param>
         private static void Set(object instance, FieldInfo field, object value)

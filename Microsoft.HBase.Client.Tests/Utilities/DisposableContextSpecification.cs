@@ -49,27 +49,27 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.
         /// </summary>
-        /// <param name="disposing"> 
+        /// <param Name="disposing"> 
         /// Use <c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources. 
         /// </param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-                Type derrivedType = GetType();
-                FieldInfo[] fields = derrivedType.GetFields();
-                foreach (FieldInfo field in fields)
+                var derrivedType = GetType();
+                var fields = derrivedType.GetFields();
+                foreach (var field in fields)
                 {
-                    object value = field.GetValue(this);
+                    var value = field.GetValue(this);
                     if (value.IsNotNull())
                     {
-                        Type valueType = value.GetType();
+                        var valueType = value.GetType();
                         if (!valueType.IsValueType)
                         {
                             var asCollectionOfDisposables = value as IEnumerable<IDisposable>;
                             if (!ReferenceEquals(asCollectionOfDisposables, null))
                             {
-                                foreach (IDisposable disposable in asCollectionOfDisposables)
+                                foreach (var disposable in asCollectionOfDisposables)
                                 {
                                     disposable.Dispose();
                                 }

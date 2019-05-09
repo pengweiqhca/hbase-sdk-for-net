@@ -16,7 +16,7 @@
 
 namespace Microsoft.HBase.Client.Filters
 {
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
 
     /// <summary>
     /// Interface for row and column filters directly applied within the regionserver.

@@ -16,17 +16,17 @@
         [TestCategory(TestRunMode.CheckIn)]
         public void All_declarations_not_under_an_internal_or_resources_namespace_are_public_or_nested()
         {
-            List<Assembly> assemblies = GetAssembliesUnderTest().ToList();
+            var assemblies = GetAssembliesUnderTest().ToList();
             assemblies.Count.ShouldBeGreaterThan(0);
 
             var violatingTypes = new HashSet<Type>();
 
-            foreach (Assembly asm in assemblies)
+            foreach (var asm in assemblies)
             {
-                List<Type> allAssemblyTypes = asm.GetTypes().ToList();
-                foreach (Type type in allAssemblyTypes)
+                var allAssemblyTypes = asm.GetTypes().ToList();
+                foreach (var type in allAssemblyTypes)
                 {
-                    string namespaceName = type.Namespace ?? string.Empty;
+                    var namespaceName = type.Namespace ?? string.Empty;
                     if (namespaceName.Length == 0)
                     {
                         // skip anonymous types.
@@ -53,17 +53,17 @@
         [TestCategory(TestRunMode.CheckIn)]
         public void All_declarations_under_an_internal_namespace_are_not_public()
         {
-            List<Assembly> assemblies = GetAssembliesUnderTest().ToList();
+            var assemblies = GetAssembliesUnderTest().ToList();
             assemblies.Count.ShouldBeGreaterThan(0);
 
             var violatingTypes = new HashSet<Type>();
 
-            foreach (Assembly asm in assemblies)
+            foreach (var asm in assemblies)
             {
-                List<Type> allAssemblyTypes = asm.GetTypes().ToList();
-                foreach (Type type in allAssemblyTypes)
+                var allAssemblyTypes = asm.GetTypes().ToList();
+                foreach (var type in allAssemblyTypes)
                 {
-                    string namespaceName = type.Namespace ?? string.Empty;
+                    var namespaceName = type.Namespace ?? string.Empty;
                     if (namespaceName.Contains(".Internal") && type.IsPublic)
                     {
                         violatingTypes.Add(type);

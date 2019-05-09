@@ -15,15 +15,14 @@
 
 namespace Microsoft.HBase.Client.Tests.Clients
 {
+    using Google.Protobuf;
+    using Microsoft.HBase.Client.Tests.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
-    using System.Threading.Tasks;
-    using Microsoft.HBase.Client.Tests.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
 
     public abstract class HBaseClientTestBase : DisposableContextSpecification
     {
@@ -33,7 +32,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
         private const string TestTablePrefix = "marlintest";
         private readonly Random _random = new Random();
 
-        public string testTableName;
+        public string TestTableName;
         private TableSchema _testTableSchema;
 
         protected override void Context()
@@ -41,8 +40,8 @@ namespace Microsoft.HBase.Client.Tests.Clients
             var client = CreateClient();
 
             // ensure tables from previous tests are cleaned up
-            TableList tables = client.ListTablesAsync().Result;
-            foreach (string name in tables.name)
+            var tables = client.ListTablesAsync().Result;
+            foreach (var name in tables.Name)
             {
                 if (name.StartsWith(TestTablePrefix, StringComparison.Ordinal))
                 {
@@ -51,10 +50,10 @@ namespace Microsoft.HBase.Client.Tests.Clients
             }
 
             // add a table specific to this test
-            testTableName = TestTablePrefix + _random.Next(10000);
+            TestTableName = TestTablePrefix + _random.Next(10000);
             _testTableSchema = new TableSchema();
-            _testTableSchema.name = testTableName;
-            _testTableSchema.columns.Add(new ColumnSchema { name = "d", maxVersions = 3 });
+            _testTableSchema.Name = TestTableName;
+            _testTableSchema.Columns.Add(new ColumnSchema { Name = "d", MaxVersions = 3 });
 
             client.CreateTableAsync(_testTableSchema).Wait();
         }
@@ -74,20 +73,20 @@ namespace Microsoft.HBase.Client.Tests.Clients
             const string testValue = "the force is strong in this column";
             var client = CreateClient();
             var set = new CellSet();
-            var row = new CellSet.Row { key = Encoding.UTF8.GetBytes(testKey) };
-            set.rows.Add(row);
+            var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey) };
+            set.Rows.Add(row);
 
-            var value = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue) };
-            row.values.Add(value);
+            var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
+            row.Values.Add(value);
 
-            client.StoreCellsAsync(testTableName, set).Wait();
-            CellSet cell = client.GetCellsAsync(testTableName, testKey).Result;
+            client.StoreCellsAsync(TestTableName, set).Wait();
+            var cell = client.GetCellsAsync(TestTableName, testKey).Result;
             // make sure the cell is in the table
-            Assert.AreEqual(Encoding.UTF8.GetString(cell.rows[0].key), testKey);
+            Assert.AreEqual(Encoding.UTF8.GetString(cell.Rows[0].Key.ToByteArray()), testKey);
             // delete cell
-            client.DeleteCellsAsync(testTableName, testKey).Wait();
+            client.DeleteCellsAsync(TestTableName, testKey).Wait();
             // get cell again, 404 exception expected
-            client.GetCellsAsync(testTableName, testKey).Wait();
+            client.GetCellsAsync(TestTableName, testKey).Wait();
         }
 
         [TestMethod]
@@ -95,11 +94,11 @@ namespace Microsoft.HBase.Client.Tests.Clients
         public void TestGetStorageClusterStatus()
         {
             var client = CreateClient();
-            StorageClusterStatus status = client.GetStorageClusterStatusAsync().Result;
+            var status = client.GetStorageClusterStatusAsync().Result;
             // TODO not really a good test
-            Assert.IsTrue(status.requests >= 0, "number of requests is negative");
-            Assert.IsTrue(status.liveNodes.Count >= 1, "number of live nodes is zero or negative");
-            Assert.IsTrue(status.liveNodes[0].requests >= 0, "number of requests to the first node is negative");
+            Assert.IsTrue(status.Requests >= 0, "number of requests is negative");
+            Assert.IsTrue(status.LiveNodes.Count >= 1, "number of live nodes is zero or negative");
+            Assert.IsTrue(status.LiveNodes[0].Requests >= 0, "number of requests to the first node is negative");
         }
 
         [TestMethod]
@@ -107,15 +106,15 @@ namespace Microsoft.HBase.Client.Tests.Clients
         public void TestGetVersion()
         {
             var client = CreateClient();
-            org.apache.hadoop.hbase.rest.protobuf.generated.Version version = client.GetVersionAsync().Result;
+            var version = client.GetVersionAsync().Result;
 
             Trace.WriteLine(version);
 
-            version.stargateVersion.ShouldNotBeNullOrEmpty();
-            version.jvmVersion.ShouldNotBeNullOrEmpty();
-            version.osVersion.ShouldNotBeNullOrEmpty();
-            version.serverVersion.ShouldNotBeNullOrEmpty();
-            version.jerseyVersion.ShouldNotBeNullOrEmpty();
+            version.StargateVersion.ShouldNotBeNullOrEmpty();
+            version.JvmVersion.ShouldNotBeNullOrEmpty();
+            version.OsVersion.ShouldNotBeNullOrEmpty();
+            version.ServerVersion.ShouldNotBeNullOrEmpty();
+            version.JerseyVersion.ShouldNotBeNullOrEmpty();
         }
 
         [TestMethod]
@@ -124,10 +123,10 @@ namespace Microsoft.HBase.Client.Tests.Clients
         {
             var client = CreateClient();
 
-            TableList tables = client.ListTablesAsync().Result;
-            List<string> testtables = tables.name.Where(item => item.StartsWith("marlintest", StringComparison.Ordinal)).ToList();
+            var tables = client.ListTablesAsync().Result;
+            var testtables = tables.Name.Where(item => item.StartsWith("marlintest", StringComparison.Ordinal)).ToList();
             Assert.AreEqual(1, testtables.Count);
-            Assert.AreEqual(testTableName, testtables[0]);
+            Assert.AreEqual(TestTableName, testtables[0]);
         }
 
         [TestMethod]
@@ -138,49 +137,49 @@ namespace Microsoft.HBase.Client.Tests.Clients
             const string testValue = "the force is strong in this column";
             var client = CreateClient();
             var set = new CellSet();
-            var row = new CellSet.Row { key = Encoding.UTF8.GetBytes(testKey) };
-            set.rows.Add(row);
+            var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey) };
+            set.Rows.Add(row);
 
-            var value = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue) };
-            row.values.Add(value);
+            var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
+            row.Values.Add(value);
 
-            client.StoreCellsAsync(testTableName, set).Wait();
+            client.StoreCellsAsync(TestTableName, set).Wait();
 
-            CellSet cells = client.GetCellsAsync(testTableName, testKey).Result;
-            Assert.AreEqual(1, cells.rows.Count);
-            Assert.AreEqual(1, cells.rows[0].values.Count);
-            Assert.AreEqual(testValue, Encoding.UTF8.GetString(cells.rows[0].values[0].data));
+            var cells = client.GetCellsAsync(TestTableName, testKey).Result;
+            Assert.AreEqual(1, cells.Rows.Count);
+            Assert.AreEqual(1, cells.Rows[0].Values.Count);
+            Assert.AreEqual(testValue, cells.Rows[0].Values[0].Data.ToStringUtf8());
         }
 
         [TestMethod]
         [TestCategory(TestRunMode.CheckIn)]
         public void TestGetCellsWithMultiGetRequest()
         {
-            string testKey1 = Guid.NewGuid().ToString();
-            string testKey2 = Guid.NewGuid().ToString();
-            string testValue1 = "the force is strong in this column " + testKey1;
-            string testValue2 = "the force is strong in this column " + testKey2;
+            var testKey1 = Guid.NewGuid().ToString();
+            var testKey2 = Guid.NewGuid().ToString();
+            var testValue1 = "the force is strong in this Column " + testKey1;
+            var testValue2 = "the force is strong in this Column " + testKey2;
 
             var client = CreateClient();
             var set = new CellSet();
-            var row1 = new CellSet.Row { key = Encoding.UTF8.GetBytes(testKey1) };
-            var row2 = new CellSet.Row { key = Encoding.UTF8.GetBytes(testKey2) };
-            set.rows.Add(row1);
-            set.rows.Add(row2);
+            var row1 = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey1) };
+            var row2 = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey2) };
+            set.Rows.Add(row1);
+            set.Rows.Add(row2);
 
-            var value1 = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue1) };
-            var value2 = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue2) };
-            row1.values.Add(value1);
-            row2.values.Add(value2);
+            var value1 = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue1) };
+            var value2 = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue2) };
+            row1.Values.Add(value1);
+            row2.Values.Add(value2);
 
-            client.StoreCellsAsync(testTableName, set).Wait();
+            client.StoreCellsAsync(TestTableName, set).Wait();
 
-            CellSet cells = client.GetCellsAsync(testTableName, new string[] { testKey1, testKey2 }).Result;
-            Assert.AreEqual(2, cells.rows.Count);
-            Assert.AreEqual(1, cells.rows[0].values.Count);
-            Assert.AreEqual(testValue1, Encoding.UTF8.GetString(cells.rows[0].values[0].data));
-            Assert.AreEqual(1, cells.rows[1].values.Count);
-            Assert.AreEqual(testValue2, Encoding.UTF8.GetString(cells.rows[1].values[0].data));
+            var cells = client.GetCellsAsync(TestTableName, new[] { testKey1, testKey2 }).Result;
+            Assert.AreEqual(2, cells.Rows.Count);
+            Assert.AreEqual(1, cells.Rows[0].Values.Count);
+            Assert.AreEqual(testValue1, cells.Rows[0].Values[0].Data.ToStringUtf8());
+            Assert.AreEqual(1, cells.Rows[1].Values.Count);
+            Assert.AreEqual(testValue2, cells.Rows[1].Values[0].Data.ToStringUtf8());
         }
 
         [TestMethod]
@@ -192,10 +191,10 @@ namespace Microsoft.HBase.Client.Tests.Clients
         public void TestTableSchema()
         {
             var client = CreateClient();
-            TableSchema schema = client.GetTableSchemaAsync(testTableName).Result;
-            Assert.AreEqual(testTableName, schema.name);
-            Assert.AreEqual(_testTableSchema.columns.Count, schema.columns.Count);
-            Assert.AreEqual(_testTableSchema.columns[0].name, schema.columns[0].name);
+            var schema = client.GetTableSchemaAsync(TestTableName).Result;
+            Assert.AreEqual(TestTableName, schema.Name);
+            Assert.AreEqual(_testTableSchema.Columns.Count, schema.Columns.Count);
+            Assert.AreEqual(_testTableSchema.Columns[0].Name, schema.Columns[0].Name);
         }
 
         public void StoreTestData(IHBaseClient hbaseClient)
@@ -203,15 +202,15 @@ namespace Microsoft.HBase.Client.Tests.Clients
             // we are going to insert the keys 0 to 100 and then do some range queries on that
             const string testValue = "the force is strong in this column";
             var set = new CellSet();
-            for (int i = 0; i < 100; i++)
+            for (var i = 0; i < 100; i++)
             {
-                var row = new CellSet.Row { key = BitConverter.GetBytes(i) };
-                var value = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue) };
-                row.values.Add(value);
-                set.rows.Add(row);
+                var row = new CellSet.Types.Row { Key = ByteString.CopyFrom(BitConverter.GetBytes(i)) };
+                var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
+                row.Values.Add(value);
+                set.Rows.Add(row);
             }
 
-            hbaseClient.StoreCellsAsync(testTableName, set).Wait();
+            hbaseClient.StoreCellsAsync(TestTableName, set).Wait();
         }
     }
 }

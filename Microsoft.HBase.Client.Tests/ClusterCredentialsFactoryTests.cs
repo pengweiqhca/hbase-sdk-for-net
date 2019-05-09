@@ -84,7 +84,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void It_should_throw_the_file_does_not_exist()
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
+            var path = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
             var fnfe =
                 (FileNotFoundException)
                 typeof(FileNotFoundException).ShouldBeThrownBy(() => DisposableHelp.SafeCreate(() => ClusterCredentialsFactory.CreateFromFile(path)));

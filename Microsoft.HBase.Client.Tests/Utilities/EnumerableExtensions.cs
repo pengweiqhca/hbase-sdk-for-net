@@ -23,8 +23,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
     internal static class EnumerableExtensions
     {
         ///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
-        ///<param name="items">The enumerable to search.</param>
-        ///<param name="predicate">The expression to test the items against.</param>
+        ///<param Name="items">The enumerable to search.</param>
+        ///<param Name="predicate">The expression to test the items against.</param>
         ///<returns>The index of the first matching item, or -1 if no items match.</returns>
         internal static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
         {
@@ -37,8 +37,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("predicate");
             }
 
-            int retVal = 0;
-            foreach (T item in items)
+            var retVal = 0;
+            foreach (var item in items)
             {
                 if (predicate(item))
                 {
@@ -71,7 +71,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         internal static IEnumerable<T> Subset<T>(this IList<T> list, int start, int end)
         {
-            int i = start;
+            var i = start;
             while (i <= end)
             {
                 yield return list[i];

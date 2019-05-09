@@ -43,7 +43,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Method that contains code to be executed before any tests in the assembly have run and allocate resources obtained by the assembly. 
         /// </summary>
-        /// <param name="context"></param>
+        /// <param Name="context"></param>
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext context)
         {
@@ -51,7 +51,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             var types = new List<Type>();
             types.Add(typeof(ClusterCredentials));
             var assemblies = new List<Assembly>();
-            foreach (Type t in types)
+            foreach (var t in types)
             {
                 assemblies.Add(t.Assembly);
             }
@@ -78,7 +78,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static void StartWindowsAzureStorageEmulator()
         {
-            Process process = Process.GetProcessesByName("DSServiceLDB").FirstOrDefault();
+            var process = Process.GetProcessesByName("DSServiceLDB").FirstOrDefault();
             if (process == null)
             {
                 var processStartInfo = new ProcessStartInfo
@@ -86,7 +86,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                     FileName = @"C:\Program Files\Microsoft SDKs\Windows Azure\Emulator\csrun.exe",
                     Arguments = "/devstore",
                 };
-                using (Process p = Process.Start(processStartInfo))
+                using (var p = Process.Start(processStartInfo))
                 {
                     p.WaitForExit();
                 }
@@ -95,7 +95,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static void StopWindowsAzureStorageEmulator()
         {
-            Process process = Process.GetProcessesByName("DSServiceLDB").FirstOrDefault();
+            var process = Process.GetProcessesByName("DSServiceLDB").FirstOrDefault();
             if (process != null)
             {
                 process.Kill();

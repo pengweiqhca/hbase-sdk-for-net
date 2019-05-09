@@ -45,7 +45,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void It_should_have_the_expected_password()
         {
-            SecureString pwd = fromString.ClusterPassword;
+            var pwd = fromString.ClusterPassword;
             disposables.Add(pwd);
             pwd.ToPlainString().ShouldEqual(expectedPlainPassword);
 

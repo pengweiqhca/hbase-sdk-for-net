@@ -15,14 +15,15 @@
 
 namespace Microsoft.HBase.Client.Tests.Clients
 {
+    using Google.Protobuf;
     using Microsoft.HBase.Client.LoadBalancing;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
+
     [TestClass]
     public class VNetClientTest : HBaseClientTestBase
     {
@@ -48,12 +49,12 @@ namespace Microsoft.HBase.Client.Tests.Clients
 
             StoreTestData(client);
             var expectedSet = new HashSet<int>(Enumerable.Range(0, 100));
-            IEnumerable<CellSet> cells = client.StatelessScannerAsync(testTableName).Result;
-            foreach (CellSet cell in cells)
+            var cells = client.StatelessScannerAsync(TestTableName).Result;
+            foreach (var cell in cells)
             {
-                foreach (CellSet.Row row in cell.rows)
+                foreach (var row in cell.Rows)
                 {
-                    int k = BitConverter.ToInt32(row.key, 0);
+                    var k = BitConverter.ToInt32(row.Key.ToByteArray(), 0);
                     expectedSet.Remove(k);
                 }
             }
@@ -70,13 +71,13 @@ namespace Microsoft.HBase.Client.Tests.Clients
             StoreTestData(client);
             var expectedSet = new HashSet<int>(Enumerable.Range(startRow, endRow - startRow));
             // TODO how to change rowkey to internal hbase binary string
-            IEnumerable<CellSet> cells = client.StatelessScannerAsync(testTableName, "", "startrow=\x0A\x00\x00\x00&endrow=\x0F\x00\x00\x00").Result;
+            var cells = client.StatelessScannerAsync(TestTableName, "", "startrow=\x0A\x00\x00\x00&endrow=\x0F\x00\x00\x00").Result;
 
-            foreach (CellSet cell in cells)
+            foreach (var cell in cells)
             {
-                foreach (CellSet.Row row in cell.rows)
+                foreach (var row in cell.Rows)
                 {
-                    int k = BitConverter.ToInt32(row.key, 0);
+                    var k = BitConverter.ToInt32(row.Key.ToByteArray(), 0);
                     expectedSet.Remove(k);
                 }
             }
@@ -91,16 +92,16 @@ namespace Microsoft.HBase.Client.Tests.Clients
             const string testValue = "the force is strong in this column";
             var client = CreateClient();
             var set = new CellSet();
-            var row = new CellSet.Row { key = Encoding.UTF8.GetBytes(testKey) };
-            set.rows.Add(row);
+            var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey) };
+            set.Rows.Add(row);
 
-            var value = new Cell { column = Encoding.UTF8.GetBytes("d:starwars"), data = Encoding.UTF8.GetBytes(testValue) };
-            row.values.Add(value);
+            var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
+            row.Values.Add(value);
 
-            client.StoreCellsAsync(testTableName, set).Wait();
-            client.StoreCellsAsync(testTableName, set).Wait();
-            CellSet cell = client.GetCellsAsync(testTableName, testKey, "d:starwars", "3").Result;
-            Assert.AreEqual(2, cell.rows[0].values.Count);
+            client.StoreCellsAsync(TestTableName, set).Wait();
+            client.StoreCellsAsync(TestTableName, set).Wait();
+            var cell = client.GetCellsAsync(TestTableName, testKey, "d:starwars", "3").Result;
+            Assert.AreEqual(2, cell.Rows[0].Values.Count);
         }
     }
 }

@@ -13,17 +13,23 @@
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
+using Google.Protobuf;
+using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
+using System.Globalization;
+using System.Text;
+
 namespace Microsoft.HBase.Client.Tests
 {
+    using Google.Protobuf;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
     using System.Net;
     using System.Text;
     using System.Threading.Tasks;
+
     [TestClass]
     public class CellOperationsTests : DisposableContextSpecification
     {
@@ -35,9 +41,9 @@ namespace Microsoft.HBase.Client.Tests
         private const string ColumnNameB = "b";
 
         private static bool _arrangementCompleted;
-        private static readonly List<FilterTestRecord> _allExpectedRecords = new List<FilterTestRecord>();
+        private static readonly List<FilterTestRecord> AllExpectedRecords = new List<FilterTestRecord>();
         private static ClusterCredentials _credentials;
-        private static readonly Encoding _encoding = Encoding.UTF8;
+        private static readonly Encoding Encoding = Encoding.UTF8;
         private static string _tableName;
         private static TableSchema _tableSchema;
 
@@ -47,10 +53,10 @@ namespace Microsoft.HBase.Client.Tests
             {
                 var client = GetClient();
                 // ensure tables from previous tests are cleaned up
-                TableList tables = client.ListTablesAsync().Result;
-                foreach (string name in tables.name)
+                var tables = client.ListTablesAsync().Result;
+                foreach (var name in tables.Name)
                 {
-                    string pinnedName = name;
+                    var pinnedName = name;
                     if (name.StartsWith(TableNamePrefix, StringComparison.Ordinal))
                     {
                         client.DeleteTableAsync(pinnedName).Wait();
@@ -81,7 +87,7 @@ namespace Microsoft.HBase.Client.Tests
 
         [TestMethod]
         [TestCategory(TestRunMode.CheckIn)]
-        public void When_I_DeleteCells_With_TimeStamp_I_can_add_with_higher_timestamp()
+        public void WhenIDeleteCellsWithTimeStampICanAddWithHigherTimestamp()
         {
             var client = GetClient();
 
@@ -107,13 +113,13 @@ namespace Microsoft.HBase.Client.Tests
 
             var retrievedCells = client.GetCellsAsync(_tableName, "1").Result;
 
-            retrievedCells.rows.Count.ShouldEqual(1);
-            retrievedCells.rows[0].values[0].timestamp.ShouldEqual(11);
+            retrievedCells.Rows.Count.ShouldEqual(1);
+            retrievedCells.Rows[0].Values[0].Timestamp.ShouldEqual(11);
         }
 
         [TestMethod]
         [TestCategory(TestRunMode.CheckIn)]
-        public void When_I_DeleteCells_With_TimeStamp_I_cannot_add_with_lower_timestamp()
+        public void WhenIDeleteCellsWithTimeStampICannotAddWithLowerTimestamp()
         {
             var client = GetClient();
 
@@ -154,20 +160,20 @@ namespace Microsoft.HBase.Client.Tests
 
         [TestMethod]
         [TestCategory(TestRunMode.CheckIn)]
-        public async Task When_I_CheckAndDeleteCells_With_TimeStamp_I_cannot_add_with_lower_timestamp_than_hbaseserver()
+        public async Task WhenICheckAndDeleteCellsWithTimeStampICannotAddWithLowerTimestampThanHbaseserver()
         {
             var client = GetClient();
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1A", 10))).Wait();
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
 
-            bool deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3","c1","1A",10));
+            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3","c1","1A",10));
 
             deleted.ShouldEqual(true);
 
             var retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
             // Deletes in the Cell c1 so c2 should be present.
-            retrievedCells.rows[0].values.Count.ShouldEqual(1);
+            retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
 
             deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c2", "1A", 10));
             deleted.ShouldEqual(true);
@@ -205,7 +211,7 @@ namespace Microsoft.HBase.Client.Tests
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
         [TestMethod]
-        public async Task When_I_CheckAndDeleteCells_With_TimeStamp_And_Cells_To_Delete_I_Can_add_with_higher_timestamp()
+        public async Task WhenICheckAndDeleteCellsWithTimeStampAndCellsToDeleteICanAddWithHigherTimestamp()
         {
             var client = GetClient();
 
@@ -213,11 +219,11 @@ namespace Microsoft.HBase.Client.Tests
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
 
             // Deletes all the ColumnFamily with timestamp less than 10
-            CellSet.Row rowToDelete = new CellSet.Row() { key = Encoding.UTF8.GetBytes("3") };
-            //rowToDelete.values.Add(GetCell(rowToDelete.key, column = BuildCellColumn(ColumnFamilyName1, "c1"), data= "1A", timestamp = 10 });
-            rowToDelete.values.Add(GetCell("3", "c1", "1A", 10));
-            rowToDelete.values.Add(GetCell("3", "c2", "1A", 10));
-            bool deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
+            var rowToDelete = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8("3") };
+            //rowToDelete.Values.Add(GetCell(rowToDelete.Key, Column = BuildCellColumn(ColumnFamilyName1, "c1"), data= "1A", Timestamp = 10 });
+            rowToDelete.Values.Add(GetCell("3", "c1", "1A", 10));
+            rowToDelete.Values.Add(GetCell("3", "c2", "1A", 10));
+            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
 
             deleted.ShouldEqual(true);
 
@@ -245,8 +251,8 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                retrievedCells.rows[0].values.Count.ShouldEqual(1);
-                Encoding.UTF8.GetString(retrievedCells.rows[0].values[0].column).ShouldBeEqualOrdinalIgnoreCase("c1");
+                retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
+                retrievedCells.Rows[0].Values[0].Column.ToStringUtf8().ShouldBeEqualOrdinalIgnoreCase("c1");
             }
             catch (Exception ex)
             {
@@ -259,7 +265,7 @@ namespace Microsoft.HBase.Client.Tests
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
         [TestMethod]
-        public async Task When_I_CheckAndDeleteCells_With_ColumnFamily_Deletes_All_cells()
+        public async Task WhenICheckAndDeleteCellsWithColumnFamilyDeletesAllCells()
         {
             var client = GetClient();
 
@@ -267,9 +273,9 @@ namespace Microsoft.HBase.Client.Tests
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
 
             // Deletes all the ColumnFamily with timestamp less than 10
-            CellSet.Row rowToDelete = new CellSet.Row() { key = Encoding.UTF8.GetBytes("3") };
-            rowToDelete.values.Add(new Cell() { row = rowToDelete.key, column = Encoding.UTF8.GetBytes(ColumnFamilyName1), timestamp = 10 });
-            bool deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
+            var rowToDelete = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8("3") };
+            rowToDelete.Values.Add(new Cell() { Row = rowToDelete.Key, Column = ByteString.CopyFromUtf8(ColumnFamilyName1), Timestamp = 10 });
+            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
 
             deleted.ShouldEqual(true);
 
@@ -293,7 +299,7 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                retrievedCells.rows[0].values.Count.ShouldEqual(1);
+                retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
             }
             catch (Exception ex)
             {
@@ -304,52 +310,52 @@ namespace Microsoft.HBase.Client.Tests
             }
         }
 
-        private CellSet CreateCellSet(params CellSet.Row[] rows)
+        private CellSet CreateCellSet(params CellSet.Types.Row[] rows)
         {
-            CellSet cellSet = new CellSet();
-            cellSet.rows.AddRange(rows);
+            var cellSet = new CellSet();
+            cellSet.Rows.AddRange(rows);
             return cellSet;
         }
 
         private Cell GetCell(string key, string columnName, string value = null, long timestamp = 0)
         {
-            Cell cell = new Cell() { column = BuildCellColumn(ColumnFamilyName1, columnName) , row = Encoding.UTF8.GetBytes(key) };
+            var cell = new Cell() { Column = BuildCellColumn(ColumnFamilyName1, columnName) , Row = ByteString.CopyFromUtf8(key) };
             if (value != null)
             {
-                cell.data = Encoding.UTF8.GetBytes(value);
+                cell.Data = ByteString.CopyFromUtf8(value);
             }
             if (timestamp > 0)
             {
-                cell.timestamp = timestamp;
+                cell.Timestamp = timestamp;
             }
             return cell;
         }
-        private CellSet.Row GetCellSet(string key, string columnName, string value, long timestamp)
+        private CellSet.Types.Row GetCellSet(string key, string columnName, string value, long timestamp)
         {
-            CellSet.Row row = new CellSet.Row() { key = Encoding.UTF8.GetBytes(key) };
-            Cell c1 = new Cell() { column = BuildCellColumn(ColumnFamilyName1, columnName ), row = row.key };
+            var row = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8(key) };
+            var c1 = new Cell() { Column = BuildCellColumn(ColumnFamilyName1, columnName ), Row = row.Key };
             if (value != null)
             {
-                c1.data = Encoding.UTF8.GetBytes(value);
+                c1.Data = ByteString.CopyFromUtf8(value);
             }
 
             if (timestamp > 0)
             {
-                c1.timestamp = timestamp;
+                c1.Timestamp = timestamp;
             }
-            row.values.Add(c1);
+            row.Values.Add(c1);
             return row;
         }
 
-        private Byte[] BuildCellColumn(string columnFamilyName, string columnName)
+        private ByteString BuildCellColumn(string columnFamilyName, string columnName)
         {
-            return _encoding.GetBytes(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", columnFamilyName, columnName));
+            return ByteString.CopyFromUtf8(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", columnFamilyName, columnName));
         }
 
-        private string ExtractColumnName(Byte[] cellColumn)
+        private string ExtractColumnName(ByteString cellColumn)
         {
-            string qualifiedColumnName = _encoding.GetString(cellColumn);
-            string[] parts = qualifiedColumnName.Split(new[] { ':' }, 2);
+            var qualifiedColumnName = cellColumn.ToStringUtf8();
+            var parts = qualifiedColumnName.Split(new[] { ':' }, 2);
             return parts[1];
         }
 
@@ -358,9 +364,9 @@ namespace Microsoft.HBase.Client.Tests
             // add a table specific to this test
             var client = GetClient();
             _tableName = TableNamePrefix + Guid.NewGuid().ToString("N");
-            _tableSchema = new TableSchema { name = _tableName };
-            _tableSchema.columns.Add(new ColumnSchema { name = ColumnFamilyName1 });
-            _tableSchema.columns.Add(new ColumnSchema { name = ColumnFamilyName2 });
+            _tableSchema = new TableSchema { Name = _tableName };
+            _tableSchema.Columns.Add(new ColumnSchema { Name = ColumnFamilyName1 });
+            _tableSchema.Columns.Add(new ColumnSchema { Name = ColumnFamilyName2 });
 
             client.CreateTableAsync(_tableSchema).Wait();
         }

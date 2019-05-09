@@ -70,13 +70,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         public object Clone()
         {
-            TFirst first = _first;
+            var first = _first;
             var cloneable1 = (object)_first as ICloneable;
             if (cloneable1 != null)
             {
                 first = (TFirst)cloneable1.Clone();
             }
-            TSecond second = _second;
+            var second = _second;
             var cloneable2 = (object)_second as ICloneable;
             if (cloneable2 != null)
             {
@@ -103,7 +103,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             {
                 return 1;
             }
-            int num = _firstComparison(_first, other.First);
+            var num = _firstComparison(_first, other.First);
             if (num == 0)
             {
                 return _secondComparison(_second, other.Second);

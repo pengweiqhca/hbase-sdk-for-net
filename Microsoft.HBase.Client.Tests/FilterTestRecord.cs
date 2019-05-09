@@ -60,7 +60,7 @@ namespace Microsoft.HBase.Client.Tests
         {
             unchecked
             {
-                int hashCode = LineNumber;
+                var hashCode = LineNumber;
                 hashCode = (hashCode * 397) ^ (A != null ? A.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (RowKey != null ? RowKey.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (B != null ? B.GetHashCode() : 0);

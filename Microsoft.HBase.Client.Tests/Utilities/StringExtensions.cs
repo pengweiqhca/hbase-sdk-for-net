@@ -91,7 +91,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             {
                 return result;
             }
-            string thisValue = value.Trim();
+            var thisValue = value.Trim();
             if (thisValue.EqualsOi("1") || thisValue.EqualsOi("-1") || thisValue.EqualsOi("yes"))
             {
                 return true;
@@ -113,7 +113,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         internal static DateTime ToDateTimeLocalEnu(this string value)
         {
-            CultureInfo specificCulture = CultureInfo.CreateSpecificCulture("en-US");
+            var specificCulture = CultureInfo.CreateSpecificCulture("en-US");
             DateTime result;
             if (DateTime.TryParse(value, specificCulture, DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.AssumeLocal, out result))
             {
@@ -198,7 +198,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         internal static string TrimNullOrEmptyToDefault(this string value, string defaultValue)
         {
-            string str = (value ?? string.Empty).Trim();
+            var str = (value ?? string.Empty).Trim();
             if (str.Length == 0)
             {
                 str = defaultValue;

@@ -21,7 +21,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
     using System.IO;
     using System.Reflection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
 
     [TestClass]
     public abstract class TestBase
@@ -58,8 +58,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         protected ImmutableHashSet<Assembly> GetAssembliesUnderTest()
         {
-            ImmutableHashSet<Assembly> rv = ImmutableHashSet<Assembly>.Empty;
-            foreach (Assembly asm in TestAssemblyInitializeCleanup.AssembliesUnderTest)
+            var rv = ImmutableHashSet<Assembly>.Empty;
+            foreach (var asm in TestAssemblyInitializeCleanup.AssembliesUnderTest)
             {
                 rv = rv.Add(asm);
             }

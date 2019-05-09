@@ -18,8 +18,7 @@ namespace Microsoft.HBase.Client
     using Microsoft.HBase.Client.Internal;
     using Microsoft.HBase.Client.LoadBalancing;
     using Microsoft.HBase.Client.Requester;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
-    using ProtoBuf;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
     using System.Collections.Generic;
     using System.Globalization;
@@ -28,6 +27,10 @@ namespace Microsoft.HBase.Client
     using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+    using Google.Protobuf;
+    using Google.Protobuf.Collections;
+    using System.Collections;
+    using Google.Protobuf.Reflection;
 
     /// <summary>
     /// A C# connector to HBase.
@@ -113,13 +116,13 @@ namespace Microsoft.HBase.Client
 
         private async Task<ScannerInformation> CreateScannerAsyncInternal(string tableName, Scanner scannerSettings, RequestOptions options)
         {
-            using (Response response = await PostRequestAsync(tableName + "/scanner", scannerSettings, options))
+            using (var response = await PostRequestAsync(tableName + "/scanner", scannerSettings, options))
             {
                 if (response.WebResponse.StatusCode != HttpStatusCode.Created)
                 {
                     using (var output = new StreamReader(await response.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't create a scanner for table {tableName}! Response code was: {response.WebResponse.StatusCode}, expected 201! Response body was: {message}");
                     }
                 }
@@ -150,13 +153,13 @@ namespace Microsoft.HBase.Client
 
         private async Task DeleteScannerAsyncInternal(string tableName, ScannerInformation scannerInfo, RequestOptions options)
         {
-            using (Response webResponse = await DeleteRequestAsync<Scanner>(tableName + "/scanner/" + scannerInfo.ScannerId, null, options))
+            using (var webResponse = await DeleteRequestAsync<Scanner>(tableName + "/scanner/" + scannerInfo.ScannerId, null, options))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
                     using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't delete scanner {scannerInfo.ScannerId} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
@@ -184,13 +187,13 @@ namespace Microsoft.HBase.Client
 
         private async Task DeleteCellsAsyncInternal(string tableName, string path, RequestOptions options)
         {
-            using (Response webResponse = await DeleteRequestAsync<Scanner>(tableName + "/" + path, null, options))
+            using (var webResponse = await DeleteRequestAsync<Scanner>(tableName + "/" + path, null, options))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
                     using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't delete row {path} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
@@ -211,12 +214,12 @@ namespace Microsoft.HBase.Client
 
         private async Task<bool> CreateTableAsyncInternal(TableSchema schema, RequestOptions options)
         {
-            if (string.IsNullOrEmpty(schema.name))
+            if (string.IsNullOrEmpty(schema.Name))
             {
-                throw new ArgumentException("schema.name was either null or empty!", "schema");
+                throw new ArgumentException("schema.Name was either null or empty!", "schema");
             }
 
-            using (Response webResponse = await PutRequestAsync(schema.name + "/schema", null, schema, options))
+            using (var webResponse = await PutRequestAsync(schema.Name + "/schema", null, schema, options))
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.Created)
                 {
@@ -232,8 +235,8 @@ namespace Microsoft.HBase.Client
                 // throw the exception otherwise
                 using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                 {
-                    string message = output.ReadToEnd();
-                    throw new WebException($"Couldn't create table {schema.name}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
+                    var message = output.ReadToEnd();
+                    throw new WebException($"Couldn't create table {schema.Name}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
                 }
             }
         }
@@ -252,13 +255,13 @@ namespace Microsoft.HBase.Client
 
         public async Task DeleteTableAsyncInternal(string table, RequestOptions options)
         {
-            using (Response webResponse = await DeleteRequestAsync<TableSchema>(table + "/schema", null, options))
+            using (var webResponse = await DeleteRequestAsync<TableSchema>(table + "/schema", null, options))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
                     using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't delete table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
@@ -277,7 +280,7 @@ namespace Microsoft.HBase.Client
             rowKey.ArgumentNotNull("rowKey");
 
             var optionToUse = options ?? _globalRequestOptions;
-            string endpoint = tableName + "/" + rowKey;
+            var endpoint = tableName + "/" + rowKey;
             if (columnName != null)
             {
                 endpoint += "/" + columnName;
@@ -303,7 +306,7 @@ namespace Microsoft.HBase.Client
             rowKeys.ArgumentNotNull("rowKey");
 
             var optionToUse = options ?? _globalRequestOptions;
-            string endpoint = tableName + "/multiget";
+            var endpoint = tableName + "/multiget";
 
             string query = null;
             for (var i = 0; i < rowKeys.Length; i++)
@@ -362,10 +365,10 @@ namespace Microsoft.HBase.Client
         /// </summary>
         /// <returns>
         /// </returns>
-        public async Task<org.apache.hadoop.hbase.rest.protobuf.generated.Version> GetVersionAsync(RequestOptions options = null)
+        public async Task<Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated.Version> GetVersionAsync(RequestOptions options = null)
         {
             var optionToUse = options ?? _globalRequestOptions;
-            return await optionToUse.RetryPolicy.ExecuteAsync(() => GetRequestAndDeserializeAsync<org.apache.hadoop.hbase.rest.protobuf.generated.Version>("version", null, optionToUse));
+            return await optionToUse.RetryPolicy.ExecuteAsync(() => GetRequestAndDeserializeAsync<Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated.Version>("version", null, optionToUse));
         }
 
         /// <summary>
@@ -397,13 +400,13 @@ namespace Microsoft.HBase.Client
 
         private async Task ModifyTableSchemaAsyncInternal(string table, TableSchema schema, RequestOptions options)
         {
-            using (Response webResponse = await PostRequestAsync(table + "/schema", schema, options))
+            using (var webResponse = await PostRequestAsync(table + "/schema", schema, options))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK && webResponse.WebResponse.StatusCode != HttpStatusCode.Created)
                 {
                     using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't modify table schema {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
                     }
                 }
@@ -425,11 +428,13 @@ namespace Microsoft.HBase.Client
 
         private async Task<CellSet> ScannerGetNextAsyncInternal(ScannerInformation scannerInfo, RequestOptions options)
         {
-            using (Response webResponse = await GetRequestAsync(scannerInfo.TableName + "/scanner/" + scannerInfo.ScannerId, null, options))
+            using (var webResponse = await GetRequestAsync(scannerInfo.TableName + "/scanner/" + scannerInfo.ScannerId, null, options))
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    return Serializer.Deserialize<CellSet>(await webResponse.WebResponse.Content.ReadAsStreamAsync());
+                    var parser = new MessageParser<CellSet>(() => new CellSet());
+
+                    return parser.ParseFrom(await webResponse.WebResponse.Content.ReadAsStreamAsync());
                 }
 
                 return null;
@@ -446,41 +451,19 @@ namespace Microsoft.HBase.Client
 
         private async Task<IEnumerable<CellSet>> StatelessScannerAsyncInternal(string tableName, string optionalRowPrefix, string scanParameters, RequestOptions options)
         {
-            using (Response webResponse = await GetRequestAsync(tableName + "/" + optionalRowPrefix + "*", scanParameters, options))
+            using (var webResponse = await GetRequestAsync(tableName + "/" + optionalRowPrefix + "*", scanParameters, options))
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    return ReadProtobufStream(await webResponse.WebResponse.Content.ReadAsStreamAsync());
+                    return Deserialize<CellSets>(await webResponse.WebResponse.Content.ReadAsStreamAsync()).Sets;
                 }
 
                 return null;
             }
         }
 
-        private IEnumerable<CellSet> ReadProtobufStream(Stream stream)
-        {
-            List<CellSet> cells = new List<CellSet>();
-            var reader = new BinaryReader(stream);
-            while (true)
-            {
-                // read chunck length
-                byte[] lengthBytes = new byte[2];
-                int readBytes = reader.Read(lengthBytes, 0, lengthBytes.Length);
-                if (readBytes <= 0)
-                {
-                    break;
-                }
-                sbyte[] slengthBytes = new sbyte[2];
-                Buffer.BlockCopy(lengthBytes, 0, slengthBytes, 0, lengthBytes.Length);
-                short length = (short)(((slengthBytes[0] & 0xFF) << 8) | (slengthBytes[1] & 0xFF));
-                byte[] cellSet = new byte[length];
-                int byteread = stream.Read(cellSet, 0, length);
-                CellSet sc = Serializer.Deserialize<CellSet>(new MemoryStream(cellSet, 0, byteread));
-                cells.Add(sc);
-            }
-
-            return cells;
-        }
+        private static T Deserialize<T>(Stream stream) where T : IMessage<T>, new() =>
+            new MessageParser<T>(() => new T()).ParseFrom(stream);
 
         /// <summary>
         /// Atomically checks if a row/family/qualifier value matches the expected value and updates
@@ -489,16 +472,16 @@ namespace Microsoft.HBase.Client
         /// <param name="row">row to update</param>
         /// <param name="cellToCheck">cell to check</param>
         /// <returns>true if the record was updated; false if condition failed at check</returns>
-        public async Task<bool> CheckAndPutAsync(string table, CellSet.Row row, Cell cellToCheck, RequestOptions options = null)
+        public async Task<bool> CheckAndPutAsync(string table, CellSet.Types.Row row, Cell cellToCheck, RequestOptions options = null)
         {
             table.ArgumentNotNullNorEmpty("table");
             row.ArgumentNotNull("row");
-            row.values.Add(cellToCheck);
+            row.Values.Add(cellToCheck);
             var cellSet = new CellSet();
-            cellSet.rows.Add(row);
+            cellSet.Rows.Add(row);
             var optionToUse = options ?? _globalRequestOptions;
 
-            return await optionToUse.RetryPolicy.ExecuteAsync<bool>(() => StoreCellsAsyncInternal(table, cellSet, optionToUse, Encoding.UTF8.GetString(row.key), CheckAndPutQuery));
+            return await optionToUse.RetryPolicy.ExecuteAsync<bool>(() => StoreCellsAsyncInternal(table, cellSet, optionToUse, Encoding.UTF8.GetString(row.Key.ToByteArray()), CheckAndPutQuery));
 
         }
 
@@ -508,27 +491,27 @@ namespace Microsoft.HBase.Client
         /// <param name="table">the table</param>
         /// <param name="cellToCheck">cell to check for deleting the row</param>
         /// <returns>true if the record was deleted; false if condition failed at check</returns>
-        public async Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Row rowToDelete = null, RequestOptions options = null)
+        public async Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Types.Row rowToDelete = null, RequestOptions options = null)
         {
             table.ArgumentNotNullNorEmpty("table");
             cellToCheck.ArgumentNotNull("cellToCheck");
 
-            CellSet.Row row;
+            CellSet.Types.Row row;
             if (rowToDelete != null)
             {
                 row = rowToDelete;
             }
             else
             {
-                row = new CellSet.Row() { key = cellToCheck.row };
+                row = new CellSet.Types.Row() { Key = cellToCheck.Row };
             }
 
-            row.values.Add(cellToCheck);
+            row.Values.Add(cellToCheck);
             var cellSet = new CellSet();
-            cellSet.rows.Add(row);
+            cellSet.Rows.Add(row);
             var optionToUse = options ?? _globalRequestOptions;
 
-            return await optionToUse.RetryPolicy.ExecuteAsync<bool>(() => StoreCellsAsyncInternal(table, cellSet, optionToUse, Encoding.UTF8.GetString(row.key), CheckAndDeleteQuery));
+            return await optionToUse.RetryPolicy.ExecuteAsync<bool>(() => StoreCellsAsyncInternal(table, cellSet, optionToUse, Encoding.UTF8.GetString(row.Key.ToByteArray()), CheckAndDeleteQuery));
 
         }
 
@@ -549,9 +532,9 @@ namespace Microsoft.HBase.Client
 
         private async Task<bool> StoreCellsAsyncInternal(string table, CellSet cells, RequestOptions options, string key = null, string query = null)
         {
-            string path = key == null ? table + "/somefalsekey" : table + "/" + key;
+            var path = key == null ? table + "/somefalsekey" : table + "/" + key;
             // note the fake row key to insert a set of cells
-            using (Response webResponse = await PutRequestAsync(path, query, cells, options))
+            using (var webResponse = await PutRequestAsync(path, query, cells, options))
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.NotModified)
                 {
@@ -562,7 +545,7 @@ namespace Microsoft.HBase.Client
                 {
                     using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
-                        string message = output.ReadToEnd();
+                        var message = output.ReadToEnd();
                         throw new WebException($"Couldn't insert into table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
@@ -571,39 +554,30 @@ namespace Microsoft.HBase.Client
         }
 
         private async Task<Response> DeleteRequestAsync<TReq>(string endpoint, TReq request, RequestOptions options)
-           where TReq : class
+           where TReq : IMessage<TReq>
         {
             return await ExecuteMethodAsync(HttpMethod.Delete, null, endpoint, request, options);
         }
 
-        private async Task<Response> ExecuteMethodAsync<TReq>(
+        private Task<Response> ExecuteMethodAsync<TReq>(
            HttpMethod method,
            string query,
            string endpoint,
            TReq request,
-           RequestOptions options) where TReq : class
-        {
-            using (var input = new MemoryStream(options.SerializationBufferSize))
-            {
-                if (request != null)
-                {
-                    Serializer.Serialize(input, request);
-                }
+           RequestOptions options) where TReq : IMessage<TReq> =>
+            _requester.IssueWebRequestAsync(endpoint, query, method, request?.ToByteArray(), options);
 
-                input.Seek(0, SeekOrigin.Begin);
-                return await _requester.IssueWebRequestAsync(endpoint, query, method, input, options);
-            }
-        }
-
-        private async Task<T> GetRequestAndDeserializeAsync<T>(string endpoint, string query, RequestOptions options)
+        private async Task<T> GetRequestAndDeserializeAsync<T>(string endpoint, string query, RequestOptions options) where T : IMessage<T>, new()
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
-            using (Response response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null, options))
+            using (var response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null, options))
             {
-                using (Stream responseStream =await response.WebResponse.Content.ReadAsStreamAsync())
+                using (var responseStream = await response.WebResponse.Content.ReadAsStreamAsync())
                 {
-                    return Serializer.Deserialize<T>(responseStream);
+                    var parser = new MessageParser<T>(() => new T());
+
+                    return parser.ParseFrom(responseStream);
                 }
             }
         }
@@ -616,7 +590,7 @@ namespace Microsoft.HBase.Client
         }
 
         private async Task<Response> PostRequestAsync<TReq>(string endpoint, TReq request, RequestOptions options)
-           where TReq : class
+           where TReq : IMessage<TReq>
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
@@ -624,7 +598,7 @@ namespace Microsoft.HBase.Client
         }
 
         private async Task<Response> PutRequestAsync<TReq>(string endpoint, string query, TReq request, RequestOptions options)
-           where TReq : class
+           where TReq : IMessage<TReq>
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");

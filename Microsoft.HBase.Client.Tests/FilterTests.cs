@@ -20,10 +20,11 @@ namespace Microsoft.HBase.Client.Tests
     using System.Globalization;
     using System.Linq;
     using System.Text;
+    using Google.Protobuf;
     using Microsoft.HBase.Client.Filters;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using Microsoft.HBase.Client.LoadBalancing;
 
     // ReSharper disable InconsistentNaming
@@ -42,7 +43,6 @@ namespace Microsoft.HBase.Client.Tests
         private static bool _arrangementCompleted;
         private static readonly List<FilterTestRecord> _allExpectedRecords = new List<FilterTestRecord>();
         private static ClusterCredentials _credentials;
-        private static readonly Encoding _encoding = Encoding.UTF8;
         private static string _tableName;
         private static TableSchema _tableSchema;
 
@@ -58,11 +58,11 @@ namespace Microsoft.HBase.Client.Tests
                 var client = new HBaseClient(_credentials);
 
                 // ensure tables from previous tests are cleaned up
-                TableList tables = client.ListTablesAsync().Result;
-                foreach (string name in tables.name)
+                var tables = client.ListTablesAsync().Result;
+                foreach (var Name in tables.Name)
                 {
-                    string pinnedName = name;
-                    if (name.StartsWith(TableNamePrefix, StringComparison.Ordinal))
+                    var pinnedName = Name;
+                    if (Name.StartsWith(TableNamePrefix, StringComparison.Ordinal))
                     {
                         client.DeleteTableAsync(pinnedName).Wait();
                     }
@@ -81,13 +81,13 @@ namespace Microsoft.HBase.Client.Tests
         {
             var client = new HBaseClient(_credentials);
             var scan = new Scanner();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scan, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
                 actualRecords.ShouldContainOnly(_allExpectedRecords);
             }
             finally
@@ -104,20 +104,20 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ColumnCountGetFilter_I_get_the_expected_results()
         {
-            // B column should not be returned, so set the value to null.
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithBValue(null)).ToList();
+            // B Column should not be returned, so set the value to null.
+            var expectedRecords = (from r in _allExpectedRecords select r.WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnCountGetFilter(2);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -134,20 +134,20 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ColumnPaginationFilter_I_get_the_expected_results()
         {
-            // only grabbing the LineNumber column with (1, 1)
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
+            // only grabbing the LineNumber Column with (1, 1)
+            var expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnPaginationFilter(1, 1);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -164,19 +164,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ColumnPrefixFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
+            var expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnPrefixFilter(Encoding.UTF8.GetBytes(LineNumberColumnName));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -193,19 +193,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ColumnRangeFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithLineNumberValue(0).WithBValue(null)).ToList();
+            var expectedRecords = (from r in _allExpectedRecords select r.WithLineNumberValue(0).WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnRangeFilter(Encoding.UTF8.GetBytes(ColumnNameA), true, Encoding.UTF8.GetBytes(ColumnNameB), false);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -223,7 +223,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_DependentColumnFilter_and_a_BinaryComparator_with_the_operator_equal_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -234,13 +234,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 new BinaryComparator(BitConverter.GetBytes(1)));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -257,20 +257,20 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_FamilyFilter_I_get_the_expected_results()
         {
-            // B is in column family 2
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithBValue(null)).ToList();
+            // B is in Column family 2
+            var expectedRecords = (from r in _allExpectedRecords select r.WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new FamilyFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(ColumnFamilyName1)));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -288,7 +288,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_FilterList_with_AND_logic_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -307,13 +307,13 @@ namespace Microsoft.HBase.Client.Tests
 
             var filter = new FilterList(FilterList.Operator.MustPassAll, f0, f1);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -331,7 +331,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_FilterList_with_OR_logic_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 2 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 2 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -350,13 +350,13 @@ namespace Microsoft.HBase.Client.Tests
 
             var filter = new FilterList(FilterList.Operator.MustPassOne, f0, f1);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -374,21 +374,21 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_FirstKeyOnlyFilter_I_get_the_expected_results()
         {
-            // a first key only filter does not return column values
-            List<FilterTestRecord> expectedRecords =
+            // a first key only filter does not return Column values
+            var expectedRecords =
                 (from r in _allExpectedRecords select new FilterTestRecord(r.RowKey, 0, string.Empty, string.Empty)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new KeyOnlyFilter();
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -407,22 +407,22 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_InclusiveStopFilter_I_get_the_expected_results()
         {
-            FilterTestRecord example = (from r in _allExpectedRecords where r.LineNumber == 2 select r).Single();
+            var example = (from r in _allExpectedRecords where r.LineNumber == 2 select r).Single();
             byte[] rawRowKey = Encoding.UTF8.GetBytes(example.RowKey);
 
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 2 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 2 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new InclusiveStopFilter(rawRowKey);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -441,21 +441,21 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_KeyOnlyFilter_I_get_the_expected_results()
         {
-            // a key only filter does not return column values
-            List<FilterTestRecord> expectedRecords =
+            // a key only filter does not return Column values
+            var expectedRecords =
                 (from r in _allExpectedRecords select new FilterTestRecord(r.RowKey, 0, string.Empty, string.Empty)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new KeyOnlyFilter();
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -473,7 +473,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_MultipleColumnPrefixFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithLineNumberValue(0)).ToList();
+            var expectedRecords = (from r in _allExpectedRecords select r.WithLineNumberValue(0)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -482,13 +482,13 @@ namespace Microsoft.HBase.Client.Tests
             var prefixes = new List<byte[]> { Encoding.UTF8.GetBytes(ColumnNameA), Encoding.UTF8.GetBytes(ColumnNameB) };
             var filter = new MultipleColumnPrefixFilter(prefixes);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -509,13 +509,13 @@ namespace Microsoft.HBase.Client.Tests
             var scanner = new Scanner();
             var filter = new PageFilter(2);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.Count.ShouldBeGreaterThanOrEqualTo(2);
             }
@@ -533,29 +533,29 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_PrefixFilter_I_get_the_expected_results()
         {
-            FilterTestRecord example = _allExpectedRecords.First();
-            byte[] rawRowkey = Encoding.UTF8.GetBytes(example.RowKey);
+            var example = _allExpectedRecords.First();
+            byte[] rawRowKey = Encoding.UTF8.GetBytes(example.RowKey);
 
             const int prefixLength = 4;
             var prefix = new byte[prefixLength];
-            Array.Copy(rawRowkey, prefix, prefixLength);
+            Array.Copy(rawRowKey, prefix, prefixLength);
 
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords
-                let rawKey = Encoding.UTF8.GetBytes(r.RowKey)
-                where rawKey[0] == prefix[0] && rawKey[1] == prefix[1] && rawKey[2] == prefix[2] && rawKey[3] == prefix[3]
-                select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords
+                                   let rawKey = ByteString.CopyFromUtf8(r.RowKey)
+                                   where rawKey[0] == prefix[0] && rawKey[1] == prefix[1] && rawKey[2] == prefix[2] && rawKey[3] == prefix[3]
+                                   select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new PrefixFilter(prefix);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -573,19 +573,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_QualifierFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
+            var expectedRecords = (from r in _allExpectedRecords select r.WithAValue(null).WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new QualifierFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(LineNumberColumnName)));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -609,13 +609,13 @@ namespace Microsoft.HBase.Client.Tests
             // set this large enough so that we get all records back
             var filter = new RandomRowFilter(2000.0F);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(_allExpectedRecords);
             }
@@ -633,21 +633,21 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_RowFilter_I_get_the_expected_results()
         {
-            FilterTestRecord example = _allExpectedRecords.First();
+            var example = _allExpectedRecords.First();
 
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.RowKey == example.RowKey select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.RowKey == example.RowKey select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new RowFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(example.RowKey)));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -665,10 +665,10 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueExcludeFilter_and_a_BinaryComparator_with_the_operator_equal_I_get_the_expected_results()
         {
-            string bValue = (from r in _allExpectedRecords select r.B).First();
+            var bValue = (from r in _allExpectedRecords select r.B).First();
 
-            // B column should not be returned, so set the value to null.
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.B == bValue select r.WithBValue(null)).ToList();
+            // B Column should not be returned, so set the value to null.
+            var expectedRecords = (from r in _allExpectedRecords where r.B == bValue select r.WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -679,13 +679,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 Encoding.UTF8.GetBytes(bValue));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -703,7 +703,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_equal_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -716,13 +716,13 @@ namespace Microsoft.HBase.Client.Tests
                 filterIfMissing: true);
 
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -739,7 +739,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_greater_than_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber > 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber > 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -750,13 +750,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.GreaterThan,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -775,7 +775,7 @@ namespace Microsoft.HBase.Client.Tests
         public void
             When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_greater_than_or_equal_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber >= 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber >= 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -786,13 +786,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.GreaterThanOrEqualTo,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -809,7 +809,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_less_than_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber < 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber < 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -820,13 +820,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.LessThan,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -844,7 +844,7 @@ namespace Microsoft.HBase.Client.Tests
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_less_than_or_equal_I_get_the_expected_results(
             )
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber <= 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -855,13 +855,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.LessThanOrEqualTo,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -890,13 +890,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.NoOperation,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -914,7 +914,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryComparator_with_the_operator_not_equal_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 1 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 1 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -924,13 +924,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.NotEqual,
                 BitConverter.GetBytes(1));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -948,7 +948,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_BinaryPrefixComparator_with_the_operator_equal_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 3 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 3 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -962,13 +962,13 @@ namespace Microsoft.HBase.Client.Tests
                 comparer,
                 filterIfMissing: false);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -986,7 +986,7 @@ namespace Microsoft.HBase.Client.Tests
         public void
             When_I_Scan_with_a_SingleColumnValueFilter_and_a_BitComparator_with_the_operator_equal_and_the_bitop_XOR_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 3 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 3 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -999,13 +999,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 comparer);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1036,13 +1036,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 comparer);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1060,10 +1060,10 @@ namespace Microsoft.HBase.Client.Tests
         public void When_I_Scan_with_a_SingleColumnValueFilter_and_a_SubstringComparator_with_the_operator_equal_I_get_the_expected_results()
         {
             // grab a substring that is guaranteed to match at least one record.
-            string ss = _allExpectedRecords.First().A.Substring(1, 2);
+            var ss = _allExpectedRecords.First().A.Substring(1, 2);
             //Debug.WriteLine("The substring value is: " + ss);
 
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.A.Contains(ss) select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.A.Contains(ss) select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
@@ -1076,13 +1076,13 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 comparer);
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1099,19 +1099,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_SkipFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 0 select r).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber != 0 select r).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new SkipFilter(new ValueFilter(CompareFilter.CompareOp.NotEqual, new BinaryComparator(BitConverter.GetBytes(0))));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1128,12 +1128,12 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_TimestampsFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = _allExpectedRecords;
+            var expectedRecords = _allExpectedRecords;
 
             // scan all and retrieve timestamps
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanAll = null;
             List<long> timestamps = null;
@@ -1160,7 +1160,7 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1177,20 +1177,20 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ValueFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords =
+            var expectedRecords =
                 (from r in _allExpectedRecords where r.LineNumber == 3 select r.WithAValue(null).WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ValueFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(BitConverter.GetBytes(3)));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1207,18 +1207,18 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_ValueFilter_and_a_RegexStringComparator_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = _allExpectedRecords;
+            var expectedRecords = _allExpectedRecords;
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ValueFilter(CompareFilter.CompareOp.Equal, new RegexStringComparator(".*"));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1235,19 +1235,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestCategory(TestRunMode.CheckIn)]
         public void When_I_Scan_with_a_WhileMatchFilter_I_get_the_expected_results()
         {
-            List<FilterTestRecord> expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 0 select r.WithBValue(null)).ToList();
+            var expectedRecords = (from r in _allExpectedRecords where r.LineNumber == 0 select r.WithBValue(null)).ToList();
 
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new WhileMatchFilter(new ValueFilter(CompareFilter.CompareOp.NotEqual, new BinaryComparator(BitConverter.GetBytes(0))));
             //scanner.filter = filter.ToEncodedString();
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
             try
             {
                 scanInfo = client.CreateScannerAsync(_tableName, scanner, scanOptions).Result;
-                List<FilterTestRecord> actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
+                var actualRecords = RetrieveResults(scanInfo, scanOptions).ToList();
 
                 actualRecords.ShouldContainOnly(expectedRecords);
             }
@@ -1269,12 +1269,12 @@ namespace Microsoft.HBase.Client.Tests
 
             while ((next = client.ScannerGetNextAsync(scanInfo, scanOptions).Result) != null)
             {
-                foreach (CellSet.Row row in next.rows)
+                foreach (var row in next.Rows)
                 {
-                    List<Cell> cells = row.values;
-                    foreach (Cell c in cells)
+                    var cells = row.Values;
+                    foreach (var c in cells)
                     {
-                        rv.Add(c.timestamp);
+                        rv.Add(c.Timestamp);
                     }
                 }
             }
@@ -1291,30 +1291,30 @@ namespace Microsoft.HBase.Client.Tests
 
             while ((next = client.ScannerGetNextAsync(scanInfo, scanOptions).Result) != null)
             {
-                foreach (CellSet.Row row in next.rows)
+                foreach (var row in next.Rows)
                 {
-                    string rowKey = _encoding.GetString(row.key);
+                    string rowKey = row.Key.ToStringUtf8();
 
-                    List<Cell> cells = row.values;
+                   var cells = row.Values;
 
                     string a = null;
                     string b = null;
-                    int lineNumber = 0;
-                    foreach (Cell c in cells)
+                    var lineNumber = 0;
+                    foreach (var c in cells)
                     {
-                        string columnName = ExtractColumnName(c.column);
+                        var columnName = ExtractColumnName(c.Column);
                         switch (columnName)
                         {
                             case LineNumberColumnName:
-                                lineNumber = c.data.Length > 0 ? BitConverter.ToInt32(c.data, 0) : 0;
+                                lineNumber = c.Data.Length > 0 ? BitConverter.ToInt32(c.Data.ToByteArray(), 0) : 0;
                                 break;
 
                             case ColumnNameA:
-                                a = _encoding.GetString(c.data);
+                                a = c.Data.ToStringUtf8();
                                 break;
 
                             case ColumnNameB:
-                                b = _encoding.GetString(c.data);
+                                b = c.Data.ToStringUtf8();
                                 break;
 
                             default:
@@ -1335,46 +1335,46 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var cellSet = new CellSet();
 
-            string id = Guid.NewGuid().ToString("N");
-            for (int lineNumber = 0; lineNumber < 10; ++lineNumber)
+            var id = Guid.NewGuid().ToString("N");
+            for (var lineNumber = 0; lineNumber < 10; ++lineNumber)
             {
-                string rowKey = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", id, lineNumber);
+                var rowKey = string.Format(CultureInfo.InvariantCulture, "{0}-{1}", id, lineNumber);
 
                 // add to expected records
                 var rec = new FilterTestRecord(rowKey, lineNumber, Guid.NewGuid().ToString("N"), Guid.NewGuid().ToString("D"));
                 _allExpectedRecords.Add(rec);
 
                 // add to row
-                var row = new CellSet.Row { key = _encoding.GetBytes(rec.RowKey) };
+                var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(rec.RowKey) };
 
                 var lineColumnValue = new Cell
                 {
-                    column = BuildCellColumn(ColumnFamilyName1, LineNumberColumnName),
-                    data = BitConverter.GetBytes(rec.LineNumber)
+                    Column = BuildCellColumn(ColumnFamilyName1, LineNumberColumnName),
+                    Data =ByteString.CopyFrom(BitConverter.GetBytes(rec.LineNumber))
                 };
-                row.values.Add(lineColumnValue);
+                row.Values.Add(lineColumnValue);
 
-                var paragraphColumnValue = new Cell { column = BuildCellColumn(ColumnFamilyName1, ColumnNameA), data = _encoding.GetBytes(rec.A) };
-                row.values.Add(paragraphColumnValue);
+                var paragraphColumnValue = new Cell { Column = BuildCellColumn(ColumnFamilyName1, ColumnNameA), Data =ByteString.CopyFromUtf8(rec.A) };
+                row.Values.Add(paragraphColumnValue);
 
-                var columnValueB = new Cell { column = BuildCellColumn(ColumnFamilyName2, ColumnNameB), data = Encoding.UTF8.GetBytes(rec.B) };
-                row.values.Add(columnValueB);
+                var columnValueB = new Cell { Column = BuildCellColumn(ColumnFamilyName2, ColumnNameB), Data = ByteString.CopyFromUtf8(rec.B) };
+                row.Values.Add(columnValueB);
 
-                cellSet.rows.Add(row);
+                cellSet.Rows.Add(row);
             }
 
             client.StoreCellsAsync(_tableName, cellSet).Wait();
         }
 
-        private Byte[] BuildCellColumn(string columnFamilyName, string columnName)
+        private ByteString BuildCellColumn(string columnFamilyName, string columnName)
         {
-            return _encoding.GetBytes(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", columnFamilyName, columnName));
+            return ByteString.CopyFromUtf8(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", columnFamilyName, columnName));
         }
 
-        private string ExtractColumnName(Byte[] cellColumn)
+        private string ExtractColumnName(ByteString cellColumn)
         {
-            string qualifiedColumnName = _encoding.GetString(cellColumn);
-            string[] parts = qualifiedColumnName.Split(new[] { ':' }, 2);
+            string qualifiedColumnName = cellColumn.ToStringUtf8();
+            var parts = qualifiedColumnName.Split(new[] { ':' }, 2);
             return parts[1];
         }
 
@@ -1383,9 +1383,9 @@ namespace Microsoft.HBase.Client.Tests
             // add a table specific to this test
             var client = new HBaseClient(_credentials);
             _tableName = TableNamePrefix + Guid.NewGuid().ToString("N");
-            _tableSchema = new TableSchema { name = _tableName };
-            _tableSchema.columns.Add(new ColumnSchema { name = ColumnFamilyName1 });
-            _tableSchema.columns.Add(new ColumnSchema { name = ColumnFamilyName2 });
+            _tableSchema = new TableSchema { Name = _tableName };
+            _tableSchema.Columns.Add(new ColumnSchema { Name = ColumnFamilyName1 });
+            _tableSchema.Columns.Add(new ColumnSchema { Name = ColumnFamilyName2 });
 
             client.CreateTableAsync(_tableSchema).Wait();
         }

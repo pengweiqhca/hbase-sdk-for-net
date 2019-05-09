@@ -40,7 +40,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerEndpointsInitialization()
         {
-            int numServers = 4;
+            var numServers = 4;
 
             var balancer = new LoadBalancerRoundRobin(numRegionServers: numServers);
             Assert.AreEqual(balancer.GetNumAvailableEndpoints(), numServers);
@@ -106,19 +106,19 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerRoundRobin()
         {
-            int numServers = 10;
+            var numServers = 10;
 
             var balancer = new LoadBalancerRoundRobin(numServers);
-            uint initRRIdx = balancer._endpointIndex;
+            var initRrIdx = balancer._endpointIndex;
 
-            for (int i = 0; i < 2 * numServers; i++)
+            for (var i = 0; i < 2 * numServers; i++)
             {
                 Uri selectedEndpoint = null;
 
                 selectedEndpoint = balancer.GetEndpoint();
 
-                var expectedRRIdx = (initRRIdx + i) % numServers;
-                var expectedEndpoint = balancer._allEndpoints[expectedRRIdx];
+                var expectedRrIdx = (initRrIdx + i) % numServers;
+                var expectedEndpoint = balancer._allEndpoints[expectedRrIdx];
                 Assert.IsTrue(selectedEndpoint.OriginalString.Equals(expectedEndpoint.OriginalString));
 
                 balancer.RecordSuccess(selectedEndpoint);
@@ -128,15 +128,15 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerDomainInit()
         {
-            int numServers = 10;
-            string testDomain = "test.fakedomain.com";
+            var numServers = 10;
+            var testDomain = "test.fakedomain.com";
             var balancer = new LoadBalancerRoundRobin(numServers, testDomain);
 
-            string[] endpoints = balancer._allEndpoints.Select(u => u.ToString()).OrderBy(s => s).ToArray();
+            var endpoints = balancer._allEndpoints.Select(u => u.ToString()).OrderBy(s => s).ToArray();
 
-            for (int i = 0; i < endpoints.Length; i++)
+            for (var i = 0; i < endpoints.Length; i++)
             {
-                string expected = $"http://{LoadBalancerRoundRobin._workerHostNamePrefix}{i}.{testDomain}:{LoadBalancerRoundRobin._workerRestEndpointPort}/";
+                var expected = $"http://{LoadBalancerRoundRobin._workerHostNamePrefix}{i}.{testDomain}:{LoadBalancerRoundRobin._workerRestEndpointPort}/";
                 Assert.AreEqual(expected, endpoints[i]);
             }
         }
@@ -144,7 +144,7 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerConcurrency()
         {
-            int numServers = 20;
+            var numServers = 20;
             var balancer = new LoadBalancerRoundRobin(numServers);
 
             var uniqueEndpointsFetched = new ConcurrentDictionary<string, bool>();
@@ -164,47 +164,47 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerConfigInitialization()
         {
-            string stringConfigInitial = Guid.NewGuid().ToString();
-            string stringConfigDefault = Guid.NewGuid().ToString();
-            string stringConfigExpected = "LoadBalancerTestConfigValue";
-            string stringConfigValidKey = "LoadBalancerTestConfigString";
-            string stringConfigInvalidKey = "LoadBalancerTestConfigStringInvalid";
+            var stringConfigInitial = Guid.NewGuid().ToString();
+            var stringConfigDefault = Guid.NewGuid().ToString();
+            var stringConfigExpected = "LoadBalancerTestConfigValue";
+            var stringConfigValidKey = "LoadBalancerTestConfigString";
+            var stringConfigInvalidKey = "LoadBalancerTestConfigStringInvalid";
 
-            string stringReadInvalid = stringConfigInitial;
+            var stringReadInvalid = stringConfigInitial;
             stringReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(stringConfigInvalidKey, string.Copy, stringConfigDefault);
             Assert.AreEqual(stringReadInvalid, stringConfigDefault);
 
-            string stringReadValid = stringConfigInitial;
+            var stringReadValid = stringConfigInitial;
             stringReadValid = LoadBalancerRoundRobin.ReadFromConfig(stringConfigValidKey, string.Copy, stringConfigDefault);
             Assert.AreEqual(stringReadValid, stringConfigExpected);
 
             var rnd = new Random();
 
-            int intConfigInitial = rnd.Next();
-            int intConfigDefault = rnd.Next();
-            int intConfigExpected = 10;
-            string intConfigValidKey = "LoadBalancerTestConfigInt";
-            string intConfigInvalidKey = "LoadBalancerTestConfigIntInvalid";
+            var intConfigInitial = rnd.Next();
+            var intConfigDefault = rnd.Next();
+            var intConfigExpected = 10;
+            var intConfigValidKey = "LoadBalancerTestConfigInt";
+            var intConfigInvalidKey = "LoadBalancerTestConfigIntInvalid";
 
-            int intReadInvalid = intConfigInitial;
+            var intReadInvalid = intConfigInitial;
             intReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(intConfigInvalidKey, Int32.Parse, intConfigDefault);
             Assert.AreEqual(intReadInvalid, intConfigDefault);
 
-            int intReadValid = intConfigInitial;
+            var intReadValid = intConfigInitial;
             intReadValid = LoadBalancerRoundRobin.ReadFromConfig(intConfigValidKey, Int32.Parse, intConfigDefault);
             Assert.AreEqual(intReadValid, intConfigExpected);
 
-            double doubleConfigInitial = rnd.NextDouble();
-            double doubleConfigDefault = rnd.NextDouble();
-            double doubleConfigExpected = 20.0;
-            string doubleConfigValidKey = "LoadBalancerTestConfigDouble";
-            string doubleConfigInvalidKey = "LoadBalancerTestConfigDoubleInvalid";
+            var doubleConfigInitial = rnd.NextDouble();
+            var doubleConfigDefault = rnd.NextDouble();
+            var doubleConfigExpected = 20.0;
+            var doubleConfigValidKey = "LoadBalancerTestConfigDouble";
+            var doubleConfigInvalidKey = "LoadBalancerTestConfigDoubleInvalid";
 
-            double doubleReadInvalid = doubleConfigInitial;
+            var doubleReadInvalid = doubleConfigInitial;
             doubleReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(doubleConfigInvalidKey, Double.Parse, doubleConfigDefault);
             Assert.AreEqual(doubleReadInvalid, doubleConfigDefault);
 
-            double doubleReadValid = doubleConfigInitial;
+            var doubleReadValid = doubleConfigInitial;
             doubleReadValid = LoadBalancerRoundRobin.ReadFromConfig(doubleConfigValidKey, Double.Parse, doubleConfigDefault);
             Assert.AreEqual(doubleReadValid, doubleConfigExpected);
 
@@ -213,15 +213,15 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestLoadBalancerIgnorePolicy()
         {
-            int numServers = 10;
-            int numBlackListedServers = 8;
+            var numServers = 10;
+            var numBlackListedServers = 8;
             var balancer = new LoadBalancerRoundRobin(numServers);
 
             var blackListedServersList = BuildServersList(numBlackListedServers);
 
             balancer._endpointIgnorePolicy = new IgnoreBlackListedEndpointsPolicy(blackListedServersList);
 
-            for (int i = 0; i < 2 * numServers; i++)
+            for (var i = 0; i < 2 * numServers; i++)
             {
                 Uri selectedEndpoint = null;
 
@@ -236,17 +236,17 @@ namespace Microsoft.HBase.Client.Tests
         [TestMethod]
         public void TestFailedEndpointsExpiry()
         {
-            int numServers = 5;
+            var numServers = 5;
 
             Uri activeEndpoint;
-            int expectedNumFailedEndpoints = 0;
-            int expectedNumAvailableEndpoints = numServers;
+            var expectedNumFailedEndpoints = 0;
+            var expectedNumAvailableEndpoints = numServers;
 
             var balancer = new LoadBalancerRoundRobin(numRegionServers: numServers);
 
             Assert.AreEqual(LoadBalancerRoundRobin._refreshInterval.TotalMilliseconds, 10.0);
 
-            for (int i = 0; i < numServers; i++)
+            for (var i = 0; i < numServers; i++)
             {
                 activeEndpoint = balancer.GetEndpoint();
                 Assert.IsNotNull(activeEndpoint);
@@ -282,7 +282,7 @@ namespace Microsoft.HBase.Client.Tests
         private List<string> BuildServersList(int n)
         {
             var list = new List<string>();
-            for (int i = 0; i < n; i++)
+            for (var i = 0; i < n; i++)
             {
                 list.Add($"http://{"workernode"}{i}:{8090}");
             }

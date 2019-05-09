@@ -18,11 +18,12 @@ namespace Microsoft.HBase.Client.Tests.Clients
     using Microsoft.HBase.Client.LoadBalancing;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using Polly;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Google.Protobuf;
 
     [TestClass]
     public class GatewayClientTest : HBaseClientTestBase
@@ -44,24 +45,24 @@ namespace Microsoft.HBase.Client.Tests.Clients
 
             StoreTestData(client);
 
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
 
             // full range scan
-            var scanSettings = new Scanner { batch = 10 };
+            var scanSettings = new Scanner { Batch = 10 };
             ScannerInformation scannerInfo = null;
             try
             {
-                scannerInfo = client.CreateScannerAsync(testTableName, scanSettings, scanOptions).Result;
+                scannerInfo = client.CreateScannerAsync(TestTableName, scanSettings, scanOptions).Result;
 
                 CellSet next;
                 var expectedSet = new HashSet<int>(Enumerable.Range(0, 100));
                 while ((next = client.ScannerGetNextAsync(scannerInfo, scanOptions).Result) != null)
                 {
-                    Assert.AreEqual(10, next.rows.Count);
-                    foreach (CellSet.Row row in next.rows)
+                    Assert.AreEqual(10, next.Rows.Count);
+                    foreach (var row in next.Rows)
                     {
-                        int k = BitConverter.ToInt32(row.key, 0);
+                        var k = BitConverter.ToInt32(row.Key.ToByteArray(), 0);
                         expectedSet.Remove(k);
                     }
                 }
@@ -71,7 +72,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
             {
                 if (scannerInfo != null)
                 {
-                    client.DeleteScannerAsync(testTableName, scannerInfo, scanOptions).Wait();
+                    client.DeleteScannerAsync(TestTableName, scannerInfo, scanOptions).Wait();
                 }
             }
         }
@@ -81,15 +82,15 @@ namespace Microsoft.HBase.Client.Tests.Clients
         public void TestScannerCreation()
         {
             var client = CreateClient();
-            var scanSettings = new Scanner { batch = 2 };
+            var scanSettings = new Scanner { Batch = 2 };
 
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scannerInfo = null;
             try
             {
-                scannerInfo = client.CreateScannerAsync(testTableName, scanSettings, scanOptions).Result;
-                Assert.AreEqual(testTableName, scannerInfo.TableName);
+                scannerInfo = client.CreateScannerAsync(TestTableName, scanSettings, scanOptions).Result;
+                Assert.AreEqual(TestTableName, scannerInfo.TableName);
                 Assert.IsNotNull(scannerInfo.ScannerId);
                 Assert.IsFalse(scannerInfo.ScannerId.StartsWith("/"), "scanner id starts with a slash");
                 Assert.IsNotNull(scannerInfo.ResponseHeaderCollection);
@@ -98,33 +99,33 @@ namespace Microsoft.HBase.Client.Tests.Clients
             {
                 if (scannerInfo != null)
                 {
-                    client.DeleteScannerAsync(testTableName, scannerInfo, scanOptions).Wait();
+                    client.DeleteScannerAsync(TestTableName, scannerInfo, scanOptions).Wait();
                 }
             }
         }
 
         [TestMethod]
         [TestCategory(TestRunMode.CheckIn)]
-        [ExpectedException(typeof(System.AggregateException), "The remote server returned an error: (404) Not Found.")]
+        [ExpectedException(typeof(AggregateException), "The remote server returned an error: (404) Not Found.")]
         public void TestScannerDeletion()
         {
             var client = CreateClient();
 
             // full range scan
-            var scanSettings = new Scanner { batch = 10 };
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanSettings = new Scanner { Batch = 10 };
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scannerInfo = null;
 
             try
             {
-                scannerInfo = client.CreateScannerAsync(testTableName, scanSettings, scanOptions).Result;
-                Assert.AreEqual(testTableName, scannerInfo.TableName);
+                scannerInfo = client.CreateScannerAsync(TestTableName, scanSettings, scanOptions).Result;
+                Assert.AreEqual(TestTableName, scannerInfo.TableName);
                 Assert.IsNotNull(scannerInfo.ScannerId);
                 Assert.IsFalse(scannerInfo.ScannerId.StartsWith("/"), "scanner id starts with a slash");
                 Assert.IsNotNull(scannerInfo.ResponseHeaderCollection);
                 // delete the scanner
-                client.DeleteScannerAsync(testTableName, scannerInfo, scanOptions).Wait();
+                client.DeleteScannerAsync(TestTableName, scannerInfo, scanOptions).Wait();
                 // try to fetch data use the deleted scanner
                 scanOptions.RetryPolicy = Policy.NoOpAsync();
                 client.ScannerGetNextAsync(scannerInfo, scanOptions).Wait();
@@ -133,7 +134,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
             {
                 if (scannerInfo != null)
                 {
-                    client.DeleteScannerAsync(testTableName, scannerInfo, scanOptions).Wait();
+                    client.DeleteScannerAsync(TestTableName, scannerInfo, scanOptions).Wait();
                 }
             }
         }
@@ -148,21 +149,21 @@ namespace Microsoft.HBase.Client.Tests.Clients
             StoreTestData(client);
 
             // subset range scan
-            var scanSettings = new Scanner { batch = 10, startRow = BitConverter.GetBytes(startRow), endRow = BitConverter.GetBytes(endRow) };
-            RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
+            var scanSettings = new Scanner { Batch = 10, StartRow = ByteString.CopyFrom(BitConverter.GetBytes(startRow)), EndRow =  ByteString.CopyFrom(BitConverter.GetBytes(endRow)) };
+            var scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scannerInfo = null;
             try
             {
-                scannerInfo = client.CreateScannerAsync(testTableName, scanSettings, scanOptions).Result;
+                scannerInfo = client.CreateScannerAsync(TestTableName, scanSettings, scanOptions).Result;
 
                 CellSet next;
                 var expectedSet = new HashSet<int>(Enumerable.Range(startRow, endRow - startRow));
                 while ((next = client.ScannerGetNextAsync(scannerInfo, scanOptions).Result) != null)
                 {
-                    foreach (CellSet.Row row in next.rows)
+                    foreach (var row in next.Rows)
                     {
-                        int k = BitConverter.ToInt32(row.key, 0);
+                        var k = BitConverter.ToInt32(row.Key.ToByteArray(), 0);
                         expectedSet.Remove(k);
                     }
                 }
@@ -172,7 +173,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
             {
                 if (scannerInfo != null)
                 {
-                    client.DeleteScannerAsync(testTableName, scannerInfo, scanOptions).Wait();
+                    client.DeleteScannerAsync(TestTableName, scannerInfo, scanOptions).Wait();
                 }
             }
         }

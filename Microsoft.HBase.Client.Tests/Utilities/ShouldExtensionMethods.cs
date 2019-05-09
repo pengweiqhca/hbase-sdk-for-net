@@ -37,8 +37,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Casts the specified obj.
         /// </summary>
-        /// <typeparam name="T"> The target type of the cast. </typeparam>
-        /// <param name="inputValue"> The object. </param>
+        /// <typeparam Name="T"> The target type of the cast. </typeparam>
+        /// <param Name="inputValue"> The object. </param>
         /// <returns> The result of the cast. </returns>
         internal static T CastTo<T>(this object inputValue)
         {
@@ -48,10 +48,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Attempts to convert two objects to compatible types.
         /// </summary>
-        /// <param name = "left">
+        /// <param Name = "left">
         /// The left object.
         /// </param>
-        /// <param name = "right">
+        /// <param Name = "right">
         /// The right object.
         /// </param>
         /// <returns>
@@ -71,8 +71,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
 
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            var leftType = left.GetType();
+            var rightType = right.GetType();
 
             // If both types are the same, nothing to do, just return the
             // pair of objects as they were presented.
@@ -92,7 +92,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             // parse the string as a numeric.
             if (leftType.IsNumeric() && rightType == typeof(string))
             {
-                string rightString = right.ToString();
+                var rightString = right.ToString();
                 if (rightString.Contains('.'))
                 {
                     return EquateNumericObjects(left, rightString.ToDoubleIc());
@@ -105,7 +105,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             // parse the left as a string.
             if (leftType == typeof(string) && rightType.IsNumeric())
             {
-                string leftString = left.ToString();
+                var leftString = left.ToString();
                 if (leftString.Contains('.'))
                 {
                     return EquateNumericObjects(leftString.ToDoubleIc(), right);
@@ -123,13 +123,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Performs a general comparison of the left value to the right value.
         /// </summary>
-        /// <param name = "left">
+        /// <param Name = "left">
         /// The left value for the comparison.
         /// </param>
-        /// <param name = "right">
+        /// <param Name = "right">
         /// The right value for the comparison.
         /// </param>
-        /// <param name = "comparisonOperator">
+        /// <param Name = "comparisonOperator">
         /// The type of comparison to perform.
         /// </param>
         /// <returns>
@@ -144,9 +144,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
             // First let the "conversion" system try to get us compatible types.
-            Pair<object, object> equated = EquateObjects(left, right);
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            var equated = EquateObjects(left, right);
+            var leftType = left.GetType();
+            var rightType = right.GetType();
 
             // If we could not find compatible types, then we can not do the comparison.
             if (equated.IsNull())
@@ -154,8 +154,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new InvalidOperationException("Unable to equate the types ({0}) and ({1})".FormatIc(leftType.FullName, rightType.FullName));
             }
 
-            object leftEquated = equated.First;
-            object rightEquated = equated.Second;
+            var leftEquated = equated.First;
+            var rightEquated = equated.Second;
 
             // Numeric comparisons are "special cased" let the numeric comparison functionality handle it.
             if (leftType.IsNumeric() && rightType.IsNumeric())
@@ -199,14 +199,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static float ShouldBeCloseTo(this float actual, float expected)
         {
@@ -216,17 +216,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
-        /// <param name = "tolerance">
+        /// <param Name = "tolerance">
         /// The deviation tolerance.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static float ShouldBeCloseTo(this float actual, float expected, float tolerance)
         {
@@ -241,14 +241,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static double ShouldBeCloseTo(this double actual, double expected)
         {
@@ -258,17 +258,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
-        /// <param name = "tolerance">
+        /// <param Name = "tolerance">
         /// The deviation tolerance.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static double ShouldBeCloseTo(this double actual, double expected, double tolerance)
         {
@@ -283,14 +283,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static DateTime ShouldBeCloseTo(this DateTime actual, DateTime expected)
         {
@@ -300,17 +300,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given value should be approximately equal to the expected value.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected value.
         /// </param>
-        /// <param name = "tolerance">
+        /// <param Name = "tolerance">
         /// The deviation tolerance.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static DateTime ShouldBeCloseTo(this DateTime actual, DateTime expected, TimeSpan tolerance)
         {
@@ -337,11 +337,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given collection should contain zero elements.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeEmpty(this IEnumerable actual)
         {
@@ -356,10 +356,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given string should be equal (case- and culture-insensitive) to the expected string.
         /// </summary>
-        /// <param name = "actual">The given string.</param>
-        /// <param name = "expected">The expected string.</param>
+        /// <param Name = "actual">The given string.</param>
+        /// <param Name = "expected">The expected string.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldBeEqualOrdinalIgnoreCase(this string actual, string expected)
         {
@@ -384,9 +384,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the condition should be <c>false</c>.
         /// </summary>
-        /// <param name = "actual">The condition.</param>
+        /// <param Name = "actual">The condition.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static bool ShouldBeFalse(this bool actual)
         {
@@ -404,10 +404,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is greater than the comparable value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The comparable value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The comparable value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeGreaterThan(this object actual, object expected)
         {
@@ -427,10 +427,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is greater than or equal to the comparable value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The comparable value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The comparable value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeGreaterThanOrEqualTo(this object actual, object expected)
         {
@@ -450,10 +450,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is less than the comparable value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The comparable value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The comparable value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeLessThan(this object actual, object expected)
         {
@@ -473,10 +473,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is less than or equal to the comparable value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The comparable value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The comparable value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeLessThanOrEqualTo(this object actual, object expected)
         {
@@ -496,11 +496,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is null.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeNull(this object actual)
         {
@@ -515,11 +515,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given string should be null or empty.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given string.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeNullOrEmpty(this IEnumerable actual)
         {
@@ -534,14 +534,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is of the specified type.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <param name = "expected">
+        /// <param Name = "expected">
         /// The expected type.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeOfType(this object actual, Type expected)
         {
@@ -566,12 +566,12 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value is of the specified type.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given value.
         /// </param>
-        /// <typeparam name = "T">The expected type.</typeparam>
+        /// <typeparam Name = "T">The expected type.</typeparam>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeOfType<T>(this object actual)
         {
@@ -582,16 +582,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should be a proper subset of the provided superset collection.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "superset">The collection that should contain the given collection.</param>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "superset">The collection that should contain the given collection.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeProperSubsetOf(this IEnumerable actual, IEnumerable superset)
         {
             actual.ShouldBeSubsetOf(superset);
-            IEnumerable<object> actualList = ConvertEnumerableToList(actual);
-            IEnumerable<object> supersetList = ConvertEnumerableToList(superset);
+            var actualList = ConvertEnumerableToList(actual);
+            var supersetList = ConvertEnumerableToList(superset);
 
             actualList.Count().ShouldNotEqual(supersetList.Count());
 
@@ -601,16 +601,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should be a proper subset of the provided superset collection.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "subset">The collection that should contain the given collection.</param>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "subset">The collection that should contain the given collection.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeProperSupersetOf(this IEnumerable actual, IEnumerable subset)
         {
             actual.ShouldBeSupersetOf(subset);
-            IEnumerable<object> actualList = ConvertEnumerableToList(actual);
-            IEnumerable<object> subsetList = ConvertEnumerableToList(subset);
+            var actualList = ConvertEnumerableToList(actual);
+            var subsetList = ConvertEnumerableToList(subset);
 
             actualList.Count().ShouldNotEqual(subsetList.Count());
 
@@ -620,15 +620,15 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should be a subset of the provided collection.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "superset">The collection that should contain the given collection.</param>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "superset">The collection that should contain the given collection.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeSubsetOf(this IEnumerable actual, IEnumerable superset)
         {
-            IEnumerable<object> actualList = ConvertEnumerableToList(actual);
-            IEnumerable<object> supersetList = ConvertEnumerableToList(superset);
+            var actualList = ConvertEnumerableToList(actual);
+            var supersetList = ConvertEnumerableToList(superset);
 
             actualList.ShouldBeSubsetOf(supersetList);
 
@@ -638,17 +638,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should contain the provided items.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "superset">The collection that should contain the given collection.</param>
-        /// <typeparam name = "T">The type of elements.</typeparam>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "superset">The collection that should contain the given collection.</param>
+        /// <typeparam Name = "T">The type of elements.</typeparam>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable<T> ShouldBeSubsetOf<T>(this IEnumerable<T> actual, IEnumerable<T> superset)
         {
             var comparer = new AssertEqualityComparer<T>();
 
-            List<T> missingItems = actual.Where(item => !superset.Contains(item, comparer)).ToList();
+            var missingItems = actual.Where(item => !superset.Contains(item, comparer)).ToList();
 
             if (missingItems.Any())
             {
@@ -665,11 +665,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should be a superset of the provided collection.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "subset">The collection that should be a subset of the given collection.</param>
-        /// <typeparam name = "T">The type of elements.</typeparam>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "subset">The collection that should be a subset of the given collection.</param>
+        /// <typeparam Name = "T">The type of elements.</typeparam>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable<T> ShouldBeSupersetOf<T>(this IEnumerable<T> actual, IEnumerable<T> subset)
         {
@@ -683,11 +683,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
             var comparer = new AssertEqualityComparer<T>();
-            List<T> missingItems = subset.Where(item => !actual.Contains(item, comparer)).ToList();
+            var missingItems = subset.Where(item => !actual.Contains(item, comparer)).ToList();
 
             if (missingItems.Any())
             {
-                string message = string.Format(
+                var message = string.Format(
                     CultureInfo.InvariantCulture,
                     "Should be a superset of: {0} \r\nsuperset collection: {1}\r\nhas missing items: {2}",
                     subset.EachToUsefulString(),
@@ -703,15 +703,15 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should be a superset of the provided items.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "subset">The collection that should be a subset of the given collection.</param>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "subset">The collection that should be a subset of the given collection.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldBeSupersetOf(this IEnumerable actual, IEnumerable subset)
         {
-            IEnumerable<object> actualList = ConvertEnumerableToList(actual);
-            IEnumerable<object> subsetList = ConvertEnumerableToList(subset);
+            var actualList = ConvertEnumerableToList(actual);
+            var subsetList = ConvertEnumerableToList(subset);
 
             actualList.ShouldBeSupersetOf(subsetList);
 
@@ -721,11 +721,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value should be delimited by the provided starting and ending delimiters.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expectedStartDelimiter">The starting delimiter.</param>
-        /// <param name = "expectedEndDelimiter">The ending delimiter.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expectedStartDelimiter">The starting delimiter.</param>
+        /// <param Name = "expectedEndDelimiter">The ending delimiter.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldBeSurroundedWith(this string actual, string expectedStartDelimiter, string expectedEndDelimiter)
         {
@@ -737,10 +737,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value should be delimited by the provided delimiter.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expectedDelimiter">The delimiter.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expectedDelimiter">The delimiter.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldBeSurroundedWith(this string actual, string expectedDelimiter)
         {
@@ -750,13 +750,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value have reference equality with the expected value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The expected value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The expected value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldBeTheSameAs(this object actual, object expected)
         {
@@ -771,14 +771,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the delegate should throw an exception of the expected type.
         /// </summary>
-        /// <param name = "exceptionType">The expected type of exception.</param>
-        /// <param name = "method">The delegate.</param>
+        /// <param Name = "exceptionType">The expected type of exception.</param>
+        /// <param Name = "method">The delegate.</param>
         /// <returns>
         /// The thrown exception.
         /// </returns>
         internal static Exception ShouldBeThrownBy(this Type exceptionType, Action method)
         {
-            Exception exception = Catch.Exception(method);
+            var exception = Catch.Exception(method);
 
             exception.ShouldNotBeNull();
             exception.ShouldBeOfType(exceptionType);
@@ -788,9 +788,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the condition should be <c>true</c>.
         /// </summary>
-        /// <param name = "actual">The condition.</param>
+        /// <param Name = "actual">The condition.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static bool ShouldBeTrue(this bool actual)
         {
@@ -808,10 +808,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given string should contain the provided substring.
         /// </summary>
-        /// <param name = "actual">The given string.</param>
-        /// <param name = "expected">The required substring.</param>
+        /// <param Name = "actual">The given string.</param>
+        /// <param Name = "expected">The required substring.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldContain(this string actual, string expected)
         {
@@ -836,10 +836,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given exception contains the required message.
         /// </summary>
-        /// <param name = "actual">The given exception.</param>
-        /// <param name = "expected">The required message.</param>
+        /// <param Name = "actual">The given exception.</param>
+        /// <param Name = "expected">The required message.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static Exception ShouldContainErrorMessage(this Exception actual, string expected)
         {
@@ -856,11 +856,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection only contain the required items.
         /// </summary>
-        /// <typeparam name = "T">The type of elements.</typeparam>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "items">The required item.</param>
+        /// <typeparam Name = "T">The type of elements.</typeparam>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "items">The required item.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable<T> ShouldContainOnly<T>(this IEnumerable<T> actual, params T[] items)
         {
@@ -870,11 +870,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection only contain the required items.
         /// </summary>
-        /// <typeparam name = "T">The type of elements.</typeparam>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "items">The required item.</param>
+        /// <typeparam Name = "T">The type of elements.</typeparam>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "items">The required item.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable<T> ShouldContainOnly<T>(this IEnumerable<T> actual, IEnumerable<T> items)
         {
@@ -891,7 +891,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             var missingItems = new List<T>();
             var comparer = new AssertEqualityComparer<T>();
 
-            foreach (T item in items)
+            foreach (var item in items)
             {
                 if (!source.Contains(item, comparer))
                 {
@@ -905,7 +905,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
             if (missingItems.Any() || source.Any())
             {
-                string message = string.Format(
+                var message = string.Format(
                     CultureInfo.InvariantCulture,
                     "Should contain only: {0} \r\nentire collection: {1}",
                     items.EachToUsefulString(),
@@ -930,10 +930,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given string end with the expected substring.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The expected substring.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The expected substring.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldEndWith(this string actual, string expected)
         {
@@ -958,11 +958,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value equal the expected value.
         /// </summary>
-        /// <typeparam name = "T">The type of objects to compare.</typeparam>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The expected value.</param>
+        /// <typeparam Name = "T">The type of objects to compare.</typeparam>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The expected value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static T ShouldEqual<T>(this T actual, T expected)
         {
@@ -976,7 +976,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         internal static IEnumerable<T> ShouldMatchSequence<T>(this IEnumerable<T> actual, IEnumerable<T> expected)
         {
-            bool matches = expected.Zip(actual, (e, a) => GeneralCompare(a, e, GeneralComparisonOperator.Equal)).All(m => m);
+            var matches = expected.Zip(actual, (e, a) => GeneralCompare(a, e, GeneralComparisonOperator.Equal)).All(m => m);
 
             if (!matches || actual.Count() != expected.Count())
             {
@@ -990,9 +990,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should contain at least one element.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
+        /// <param Name = "actual">The given collection.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldNotBeEmpty(this IEnumerable actual)
         {
@@ -1007,9 +1007,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not be null.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
+        /// <param Name = "actual">The given value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeNull(this object actual)
         {
@@ -1024,11 +1024,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts that the given string should not be null or empty.
         /// </summary>
-        /// <param name = "actual">
+        /// <param Name = "actual">
         /// The given string.
         /// </param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldNotBeNullOrEmpty(this IEnumerable actual)
         {
@@ -1043,10 +1043,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not be of the provided type.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "type">The provided type.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "type">The provided type.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeOfType(this object actual, Type type)
         {
@@ -1059,7 +1059,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("actual");
             }
 
-            Type actualType = actual.GetType();
+            var actualType = actual.GetType();
             if (type.IsAssignableFrom(actualType))
             {
                 throw NewException("Should not be of type {0} but is of type {1}", type, actualType);
@@ -1071,10 +1071,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not be of the provided type.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "types">The provided type.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "types">The provided type.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeOfType(this object actual, IEnumerable<Type> types)
         {
@@ -1088,8 +1088,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("types");
             }
 
-            Type actualType = actual.GetType();
-            foreach (Type t in types.Where(t => t.IsAssignableFrom(actualType)))
+            var actualType = actual.GetType();
+            foreach (var t in types.Where(t => t.IsAssignableFrom(actualType)))
             {
                 throw NewException("Should not be of type {0} but is of type {1}", t, actualType);
             }
@@ -1100,10 +1100,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not have reference equality with the reference value.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "reference">The disallowed value.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "reference">The disallowed value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeTheSameAs(this object actual, object reference)
         {
@@ -1118,10 +1118,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not have reference equality with the reference values.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "references">The disallowed values.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "references">The disallowed values.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeTheSameAs(this object actual, params object[] references)
         {
@@ -1132,10 +1132,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not have reference equality with the reference values.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "references">The disallowed values.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "references">The disallowed values.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotBeTheSameAs(this object actual, IEnumerable<object> references)
         {
@@ -1144,7 +1144,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 throw new ArgumentNullException("references");
             }
 
-            foreach (object item in references)
+            foreach (var item in references)
             {
                 actual.ShouldBeTheSameAs(item);
             }
@@ -1155,10 +1155,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given string should not contain the provided substring.
         /// </summary>
-        /// <param name = "actual">The given string.</param>
-        /// <param name = "expected">The required substring.</param>
+        /// <param Name = "actual">The given string.</param>
+        /// <param Name = "expected">The required substring.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldNotContain(this string actual, string expected)
         {
@@ -1183,14 +1183,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should not contain any of the provided items.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "items">The disallowed items.</param>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "items">The disallowed items.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable ShouldNotContain(this IEnumerable actual, params object[] items)
         {
-            IEnumerable<object> actualList = actual.Cast<object>();
+            var actualList = actual.Cast<object>();
             IEnumerable<object> expectedList = items;
 
             actualList.ShouldNotContain(expectedList);
@@ -1200,17 +1200,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given collection should not contain any of the provided items.
         /// </summary>
-        /// <param name = "actual">The given collection.</param>
-        /// <param name = "items">The disallowed items.</param>
-        /// <typeparam name = "T">The type of elements.</typeparam>
+        /// <param Name = "actual">The given collection.</param>
+        /// <param Name = "items">The disallowed items.</param>
+        /// <typeparam Name = "T">The type of elements.</typeparam>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static IEnumerable<T> ShouldNotContain<T>(this IEnumerable<T> actual, params T[] items)
         {
             var comparer = new AssertEqualityComparer<T>();
 
-            List<T> contains = items.Where(item => actual.Contains(item, comparer)).ToList();
+            var contains = items.Where(item => actual.Contains(item, comparer)).ToList();
 
             if (contains.Any())
             {
@@ -1227,11 +1227,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given value not equal the disallowed value.
         /// </summary>
-        /// <typeparam name = "T">The type of objects to compare.</typeparam>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The disallowed value.</param>
+        /// <typeparam Name = "T">The type of objects to compare.</typeparam>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The disallowed value.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static object ShouldNotEqual<T>(this T actual, T expected)
         {
@@ -1246,10 +1246,10 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Asserts the given string start with the expected substring.
         /// </summary>
-        /// <param name = "actual">The given value.</param>
-        /// <param name = "expected">The expected substring.</param>
+        /// <param Name = "actual">The given value.</param>
+        /// <param Name = "expected">The expected substring.</param>
         /// <returns>
-        /// The <paramref name = "actual" /> argument value.
+        /// The <paramref Name = "actual" /> argument value.
         /// </returns>
         internal static string ShouldStartWith(this string actual, string expected)
         {
@@ -1387,8 +1387,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static Pair<object, object> EquateIntegerObjects(object left, object right)
         {
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            var leftType = left.GetType();
+            var rightType = right.GetType();
 
             // If neither type is a ulong (or it is a ulong but is less that the value of long.MaxValue), 
             // then it is safe to cast both to long and all comparisons operations will work correctly.
@@ -1415,8 +1415,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static Pair<object, object> EquateNumericObjects(object left, object right)
         {
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            var leftType = left.GetType();
+            var rightType = right.GetType();
 
             // If either type is a Boolean value transform both types to a Boolean
             if (leftType == typeof(bool) || rightType == typeof(bool))
@@ -1497,8 +1497,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static bool NumericCompare(object left, object right, GeneralComparisonOperator comparisonOperator)
         {
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            var leftType = left.GetType();
+            var rightType = right.GetType();
 
             // There is no Reference Equality as that would have been handle by the caller, so we only have to 
             // deal with mathematical comparisons.
@@ -1532,7 +1532,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
             // We only need to test one for ulong because the other can't be (we've handled the case where they both are).
-            bool leftIsUlong = left.Is<ulong>();
+            var leftIsUlong = left.Is<ulong>();
 
             // Okay now the special case rules for ulong types.  We already know that both are not 
             // ulong types (as that has already been handled).  The casting rules will only result with 
@@ -1569,7 +1569,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
         private static bool StringCompare(string left, string right, GeneralComparisonOperator comparisonOperator)
         {
-            int comp = left.CompareOs(right);
+            var comp = left.CompareOs(right);
 
             // switch on the comparison operator and perform the comparison.)
             switch (comparisonOperator)
@@ -1596,11 +1596,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 return string.Empty;
             }
 
-            string[] split = str.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+            var split = str.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
             var sb = new StringBuilder();
 
             sb.Append("  " + split[0]);
-            foreach (string part in split.Skip(1))
+            foreach (var part in split.Skip(1))
             {
                 sb.AppendLine();
                 sb.Append("  " + part);
@@ -1637,7 +1637,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             var objAsEnumerable = obj as IEnumerable;
             if (objAsEnumerable != null)
             {
-                IEnumerable<object> enumerable = objAsEnumerable.Cast<object>();
+                var enumerable = objAsEnumerable.Cast<object>();
 
                 return obj.GetType() + ":\n" + enumerable.EachToUsefulString();
             }

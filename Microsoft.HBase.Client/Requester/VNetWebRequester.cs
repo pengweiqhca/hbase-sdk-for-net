@@ -57,7 +57,7 @@ namespace Microsoft.HBase.Client.Requester
         /// <param name="input">The input.</param>
         /// <param name="options">request options</param>
         /// <returns></returns>
-        public async Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, Stream input, RequestOptions options)
+        public async Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input, RequestOptions options)
         {
             options.Validate();
             var watch = Stopwatch.StartNew();
@@ -97,7 +97,7 @@ namespace Microsoft.HBase.Client.Requester
 
                 if (input != null)
                 {
-                    httpWebRequest.Content = new StreamContent(input) { Headers = { ContentType = _httpClient.DefaultRequestHeaders.Accept.First() } };
+                    httpWebRequest.Content = new ByteArrayContent(input) { Headers = { ContentType = _httpClient.DefaultRequestHeaders.Accept.First() } };
                 }
 
                 var response = await _httpClient.SendAsync(httpWebRequest);

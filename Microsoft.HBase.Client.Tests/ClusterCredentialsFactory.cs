@@ -36,13 +36,13 @@ namespace Microsoft.HBase.Client.Tests
         /// _mySup3rS4f3P4ssW0rd.
         /// 
         /// </summary>
-        /// <param name="path">a file system path that contains a text file with the credentials</param>
+        /// <param Name="path">a file system path that contains a text file with the credentials</param>
         /// <returns>a ClusterCredentials object with the cluster URI, user and the password</returns>
         internal static ClusterCredentials CreateFromFile(string path)
         {
             path.ArgumentNotNull("path");
 
-            List<string> lines = File.ReadAllLines(path).ToList();
+            var lines = File.ReadAllLines(path).ToList();
             return CreateFromList(lines);
         }
 

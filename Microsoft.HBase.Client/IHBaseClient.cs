@@ -1,40 +1,40 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
 namespace Microsoft.HBase.Client
 {
     using System.Threading.Tasks;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System.Collections.Generic;
     /// <summary>
-    /// A C# connector to HBase. 
+    /// A C# connector to HBase.
     /// </summary>
     /// <remarks>
     /// It currently targets HBase 0.98.4 and HDInsight 3.2 on Microsoft Azure.
     /// The communication works through HBase REST (StarGate) which uses ProtoBuf as a serialization format.
-    /// 
+    ///
     /// The usage is quite simple:
-    /// 
+    ///
     /// <code>
     /// var credentials = ClusterCredentials.FromFile("credentials.txt");
     /// var client = new HBaseClient(credentials);
     /// var version = await client.GetVersionAsync();
-    /// 
+    ///
     /// Console.WriteLine(version);
     /// </code>
-    /// 
+    ///
     /// Scan Requests are stateful. Please provide RequestOption for every scan requests to specify the request is sent to which REST server.
     /// In Gateway mode, RequestOption.AlternativeEndpoint need to be set to "hbaserest0/","hbaserest1/","hbaserest2/"...etc.
     /// In VNET mode,  RequestOption.AlternativeEndpoint need to be set to "/" and RequestOption.AlternativeHost need to be set or use loadbalancer.
@@ -52,7 +52,7 @@ namespace Microsoft.HBase.Client
         Task<ScannerInformation> CreateScannerAsync(string tableName, Scanner scannerSettings, RequestOptions options);
 
         /// <summary>
-        /// Deletes scanner.        
+        /// Deletes scanner.
         /// </summary>
         /// <param name="tableName">the table the scanner is associated with.</param>
         /// <param name="scannerInfo">the scanner information retrieved by #CreateScanner()</param>
@@ -60,7 +60,7 @@ namespace Microsoft.HBase.Client
         Task DeleteScannerAsync(string tableName, ScannerInformation scannerInfo, RequestOptions options);
 
         /// <summary>
-        /// Deletes row with specific row key.        
+        /// Deletes row with specific row key.
         /// </summary>
         /// <param name="tableName">the table name</param>
         /// <param name="rowKey">the row to delete</param>
@@ -107,7 +107,7 @@ namespace Microsoft.HBase.Client
         /// <param name="options">The options.</param>
         /// <returns></returns>
         Task<CellSet> GetCellsAsync(string tableName, string[] rowKeys, RequestOptions options = null);
-        
+
         /// <summary>
         /// Gets the storage cluster status asynchronous.
         /// </summary>
@@ -135,7 +135,7 @@ namespace Microsoft.HBase.Client
         /// </summary>
         /// <returns>
         /// </returns>
-        Task<org.apache.hadoop.hbase.rest.protobuf.generated.Version> GetVersionAsync(RequestOptions options = null);
+        Task<Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated.Version> GetVersionAsync(RequestOptions options = null);
 
         /// <summary>
         /// Lists the tables asynchronously.
@@ -145,8 +145,8 @@ namespace Microsoft.HBase.Client
         Task<TableList> ListTablesAsync(RequestOptions options = null);
 
         /// <summary>
-        /// Modifies a table schema. 
-        /// If necessary it creates a new table with the given schema. 
+        /// Modifies a table schema.
+        /// If necessary it creates a new table with the given schema.
         /// If something went wrong, a WebException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
@@ -176,7 +176,7 @@ namespace Microsoft.HBase.Client
         /// <param name="row">row to update</param>
         /// <param name="cellToCheck">cell to check</param>
         /// <returns>true if the record was updated; false if condition failed at check</returns>
-        Task<bool> CheckAndPutAsync(string table, CellSet.Row row, Cell cellToCheck, RequestOptions options = null);
+        Task<bool> CheckAndPutAsync(string table, CellSet.Types.Row row, Cell cellToCheck, RequestOptions options = null);
 
         /// <summary>
         /// Automically checks if a row/family/qualifier value matches the expected value and deletes
@@ -185,7 +185,7 @@ namespace Microsoft.HBase.Client
         /// <param name="cellToCheck">cell to check for deleting the row</param>
         /// <param name="row">row cells to delete</param>
         /// <returns>true if the record was deleted; false if condition failed at check</returns>
-        Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Row row = null, RequestOptions options = null);
+        Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Types.Row row = null, RequestOptions options = null);
 
 
         Task<IEnumerable<CellSet>> StatelessScannerAsync(string tableName, string optionalRowPrefix = null, string scanParameters = null, RequestOptions options = null);

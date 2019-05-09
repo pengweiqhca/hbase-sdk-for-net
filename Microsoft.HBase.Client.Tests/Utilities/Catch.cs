@@ -29,7 +29,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Executes and action, capturing the thrown exception if any.
         /// </summary>
-        /// <param name = "throwingAction">
+        /// <param Name = "throwingAction">
         /// The action to execute.
         /// </param>
         /// <returns>

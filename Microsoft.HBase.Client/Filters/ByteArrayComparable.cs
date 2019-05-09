@@ -18,7 +18,7 @@ namespace Microsoft.HBase.Client.Filters
     using System;
     using System.Diagnostics.CodeAnalysis;
     using Microsoft.HBase.Client.Internal;
-    using org.apache.hadoop.hbase.rest.protobuf.generated;
+    using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
 
     /// <summary>
     /// Base class for byte array comparators.
