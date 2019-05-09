@@ -37,7 +37,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The chance.
         /// </value>
-        public float Chance { get; private set; }
+        public float Chance { get; }
 
         /// <inheritdoc/>
         public override string ToEncodedString()

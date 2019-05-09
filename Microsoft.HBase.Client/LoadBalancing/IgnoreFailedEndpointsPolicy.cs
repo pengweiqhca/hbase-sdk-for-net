@@ -107,7 +107,7 @@ namespace Microsoft.HBase.Client.LoadBalancing
         {
             _endpoints = new Dictionary<Uri, EndpointInformation>();
 
-            foreach (Uri e in endpoints)
+            foreach (var e in endpoints)
             {
                 var info = new EndpointInformation() 
                 { 

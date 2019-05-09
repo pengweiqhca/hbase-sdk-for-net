@@ -39,7 +39,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The filter.
         /// </value>
-        public Filter Filter { get; private set; }
+        public Filter Filter { get; }
 
         /// <inheritdoc/>
         public override string ToEncodedString()

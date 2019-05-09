@@ -23,7 +23,7 @@ namespace Microsoft.HBase.Client.Tests
             return new FilterTestRecord(value.RowKey, lineNumber, value.A, value.B);
         }
     }
-    
+
     internal class FilterTestRecord : IEquatable<FilterTestRecord>
     {
         internal FilterTestRecord(string rowKey, int lineNumber, string a, string b)
@@ -70,7 +70,7 @@ namespace Microsoft.HBase.Client.Tests
 
         public override string ToString()
         {
-            return string.Format("RowKey: {0}, LineNumber: {1}, A: {2}, B: {3}", RowKey, LineNumber, A, B);
+            return $"RowKey: {RowKey}, LineNumber: {LineNumber}, A: {A}, B: {B}";
         }
 
         public static bool operator ==(FilterTestRecord left, FilterTestRecord right)

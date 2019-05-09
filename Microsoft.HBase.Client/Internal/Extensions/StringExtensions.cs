@@ -51,7 +51,7 @@ namespace Microsoft.HBase.Client.Internal
             var rv = new SecureString();
             try
             {
-                foreach (char c in value)
+                foreach (var c in value)
                 {
                     rv.AppendChar(c);
                 }

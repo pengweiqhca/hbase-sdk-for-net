@@ -42,7 +42,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The maximum size of a page.
         /// </value>
-        public long PageSize { get; private set; }
+        public long PageSize { get; }
 
         /// <inheritdoc/>
         public override string ToEncodedString()

@@ -36,7 +36,7 @@ namespace Microsoft.HBase.Client.Filters
             prefixes.ArgumentNotNull("prefixes");
 
             _prefixes = new HashSet<byte[]>(new ByteArrayEqualityComparer());
-            foreach (byte[] p in prefixes)
+            foreach (var p in prefixes)
             {
                 if (ReferenceEquals(p, null))
                 {
@@ -57,7 +57,7 @@ namespace Microsoft.HBase.Client.Filters
             get
             {
                 var rv = new List<byte[]>();
-                foreach (byte[] p in _prefixes)
+                foreach (var p in _prefixes)
                 {
                     rv.Add((byte[])p.Clone());
                 }
@@ -78,7 +78,7 @@ namespace Microsoft.HBase.Client.Filters
             values.ArgumentNotNull("values");
 
             var working = new StringBuilder();
-            foreach (byte[] v in values)
+            foreach (var v in values)
             {
                 working.AppendFormat(@"""{0}"",", Convert.ToBase64String(v));
             }

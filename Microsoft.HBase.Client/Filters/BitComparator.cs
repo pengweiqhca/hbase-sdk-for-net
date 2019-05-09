@@ -68,7 +68,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The bit operator.
         /// </value>
-        public BitwiseOp BitOperator { get; private set; }
+        public BitwiseOp BitOperator { get; }
 
         /// <inheritdoc/>
         public override string ToEncodedString()

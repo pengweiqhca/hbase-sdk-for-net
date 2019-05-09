@@ -64,7 +64,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// <c>true</c> if maximum column is in the range; otherwise, <c>false</c>.
         /// </value>
-        public bool MaxColumnInclusive { get; private set; }
+        public bool MaxColumnInclusive { get; }
 
         /// <summary>
         /// Gets the minimum column.
@@ -84,7 +84,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// <c>true</c> if the minimum column is in the range; otherwise, <c>false</c>.
         /// </value>
-        public bool MinColumnInclusive { get; private set; }
+        public bool MinColumnInclusive { get; }
 
         /// <inheritdoc/>
         [SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]

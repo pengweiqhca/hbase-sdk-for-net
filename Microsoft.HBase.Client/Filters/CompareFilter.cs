@@ -89,7 +89,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The comparator.
         /// </value>
-        public ByteArrayComparable Comparator { get; private set; }
+        public ByteArrayComparable Comparator { get; }
 
         /// <summary>
         /// Gets the compare operation.
@@ -97,6 +97,6 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The compare operation.
         /// </value>
-        public CompareOp CompareOperation { get; private set; }
+        public CompareOp CompareOperation { get; }
     }
 }

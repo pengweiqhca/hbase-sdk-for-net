@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -110,7 +110,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnCountGetFilter(2);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -140,7 +140,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnPaginationFilter(1, 1);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -169,7 +169,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnPrefixFilter(Encoding.UTF8.GetBytes(LineNumberColumnName));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -198,7 +198,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ColumnRangeFilter(Encoding.UTF8.GetBytes(ColumnNameA), true, Encoding.UTF8.GetBytes(ColumnNameB), false);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -233,7 +233,7 @@ namespace Microsoft.HBase.Client.Tests
                 false,
                 CompareFilter.CompareOp.Equal,
                 new BinaryComparator(BitConverter.GetBytes(1)));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -263,7 +263,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new FamilyFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(ColumnFamilyName1)));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -306,7 +306,7 @@ namespace Microsoft.HBase.Client.Tests
                 BitConverter.GetBytes(2));
 
             var filter = new FilterList(FilterList.Operator.MustPassAll, f0, f1);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -349,7 +349,7 @@ namespace Microsoft.HBase.Client.Tests
                 BitConverter.GetBytes(2));
 
             var filter = new FilterList(FilterList.Operator.MustPassOne, f0, f1);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -381,7 +381,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new KeyOnlyFilter();
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -415,7 +415,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new InclusiveStopFilter(rawRowKey);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -448,7 +448,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new KeyOnlyFilter();
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -481,7 +481,7 @@ namespace Microsoft.HBase.Client.Tests
             // set this large enough so that we get all records back
             var prefixes = new List<byte[]> { Encoding.UTF8.GetBytes(ColumnNameA), Encoding.UTF8.GetBytes(ColumnNameB) };
             var filter = new MultipleColumnPrefixFilter(prefixes);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -508,7 +508,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new PageFilter(2);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -548,7 +548,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new PrefixFilter(prefix);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -578,7 +578,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new QualifierFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(LineNumberColumnName)));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -608,7 +608,7 @@ namespace Microsoft.HBase.Client.Tests
 
             // set this large enough so that we get all records back
             var filter = new RandomRowFilter(2000.0F);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -640,7 +640,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new RowFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(Encoding.UTF8.GetBytes(example.RowKey)));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -678,7 +678,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(ColumnNameB),
                 CompareFilter.CompareOp.Equal,
                 Encoding.UTF8.GetBytes(bValue));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -715,7 +715,7 @@ namespace Microsoft.HBase.Client.Tests
                 BitConverter.GetBytes(1),
                 filterIfMissing: true);
 
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -749,7 +749,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.GreaterThan,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -785,7 +785,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.GreaterThanOrEqualTo,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -819,7 +819,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.LessThan,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -854,7 +854,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.LessThanOrEqualTo,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -889,7 +889,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.NoOperation,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -923,7 +923,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.NotEqual,
                 BitConverter.GetBytes(1));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -961,7 +961,7 @@ namespace Microsoft.HBase.Client.Tests
                 CompareFilter.CompareOp.Equal,
                 comparer,
                 filterIfMissing: false);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -998,7 +998,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.Equal,
                 comparer);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1035,7 +1035,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(LineNumberColumnName),
                 CompareFilter.CompareOp.Equal,
                 comparer);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1075,7 +1075,7 @@ namespace Microsoft.HBase.Client.Tests
                 Encoding.UTF8.GetBytes(ColumnNameA),
                 CompareFilter.CompareOp.Equal,
                 comparer);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1104,7 +1104,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new SkipFilter(new ValueFilter(CompareFilter.CompareOp.NotEqual, new BinaryComparator(BitConverter.GetBytes(0))));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1155,7 +1155,7 @@ namespace Microsoft.HBase.Client.Tests
             // timestamps scan
             scanner = new Scanner();
             var filter = new TimestampsFilter(timestamps);
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             ScannerInformation scanInfo = null;
             try
             {
@@ -1183,7 +1183,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ValueFilter(CompareFilter.CompareOp.Equal, new BinaryComparator(BitConverter.GetBytes(3)));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1211,7 +1211,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new ValueFilter(CompareFilter.CompareOp.Equal, new RegexStringComparator(".*"));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;
@@ -1240,7 +1240,7 @@ namespace Microsoft.HBase.Client.Tests
             var client = new HBaseClient(_credentials);
             var scanner = new Scanner();
             var filter = new WhileMatchFilter(new ValueFilter(CompareFilter.CompareOp.NotEqual, new BinaryComparator(BitConverter.GetBytes(0))));
-            scanner.filter = filter.ToEncodedString();
+            //scanner.filter = filter.ToEncodedString();
             RequestOptions scanOptions = RequestOptions.GetDefaultOptions();
             scanOptions.AlternativeEndpoint = Constants.RestEndpointBaseZero;
             ScannerInformation scanInfo = null;

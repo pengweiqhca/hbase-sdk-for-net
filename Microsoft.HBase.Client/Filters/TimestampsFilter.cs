@@ -66,7 +66,7 @@ namespace Microsoft.HBase.Client.Filters
             values.ArgumentNotNull("values");
 
             var working = new StringBuilder();
-            foreach (long v in values)
+            foreach (var v in values)
             {
                 working.AppendFormat(@"""{0}"",", v);
             }

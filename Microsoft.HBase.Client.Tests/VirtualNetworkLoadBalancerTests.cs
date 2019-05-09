@@ -136,7 +136,7 @@ namespace Microsoft.HBase.Client.Tests
 
             for (int i = 0; i < endpoints.Length; i++)
             {
-                string expected = string.Format("http://{0}{1}.{2}:{3}/", LoadBalancerRoundRobin._workerHostNamePrefix, i, testDomain, LoadBalancerRoundRobin._workerRestEndpointPort);
+                string expected = $"http://{LoadBalancerRoundRobin._workerHostNamePrefix}{i}.{testDomain}:{LoadBalancerRoundRobin._workerRestEndpointPort}/";
                 Assert.AreEqual(expected, endpoints[i]);
             }
         }
@@ -171,11 +171,11 @@ namespace Microsoft.HBase.Client.Tests
             string stringConfigInvalidKey = "LoadBalancerTestConfigStringInvalid";
 
             string stringReadInvalid = stringConfigInitial;
-            stringReadInvalid = LoadBalancerRoundRobin.ReadFromConfig<string>(stringConfigInvalidKey, string.Copy, stringConfigDefault);
+            stringReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(stringConfigInvalidKey, string.Copy, stringConfigDefault);
             Assert.AreEqual(stringReadInvalid, stringConfigDefault);
 
             string stringReadValid = stringConfigInitial;
-            stringReadValid = LoadBalancerRoundRobin.ReadFromConfig<string>(stringConfigValidKey, string.Copy, stringConfigDefault);
+            stringReadValid = LoadBalancerRoundRobin.ReadFromConfig(stringConfigValidKey, string.Copy, stringConfigDefault);
             Assert.AreEqual(stringReadValid, stringConfigExpected);
 
             var rnd = new Random();
@@ -187,11 +187,11 @@ namespace Microsoft.HBase.Client.Tests
             string intConfigInvalidKey = "LoadBalancerTestConfigIntInvalid";
 
             int intReadInvalid = intConfigInitial;
-            intReadInvalid = LoadBalancerRoundRobin.ReadFromConfig<int>(intConfigInvalidKey, Int32.Parse, intConfigDefault);
+            intReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(intConfigInvalidKey, Int32.Parse, intConfigDefault);
             Assert.AreEqual(intReadInvalid, intConfigDefault);
 
             int intReadValid = intConfigInitial;
-            intReadValid = LoadBalancerRoundRobin.ReadFromConfig<int>(intConfigValidKey, Int32.Parse, intConfigDefault);
+            intReadValid = LoadBalancerRoundRobin.ReadFromConfig(intConfigValidKey, Int32.Parse, intConfigDefault);
             Assert.AreEqual(intReadValid, intConfigExpected);
 
             double doubleConfigInitial = rnd.NextDouble();
@@ -201,11 +201,11 @@ namespace Microsoft.HBase.Client.Tests
             string doubleConfigInvalidKey = "LoadBalancerTestConfigDoubleInvalid";
 
             double doubleReadInvalid = doubleConfigInitial;
-            doubleReadInvalid = LoadBalancerRoundRobin.ReadFromConfig<double>(doubleConfigInvalidKey, Double.Parse, doubleConfigDefault);
+            doubleReadInvalid = LoadBalancerRoundRobin.ReadFromConfig(doubleConfigInvalidKey, Double.Parse, doubleConfigDefault);
             Assert.AreEqual(doubleReadInvalid, doubleConfigDefault);
 
             double doubleReadValid = doubleConfigInitial;
-            doubleReadValid = LoadBalancerRoundRobin.ReadFromConfig<double>(doubleConfigValidKey, Double.Parse, doubleConfigDefault);
+            doubleReadValid = LoadBalancerRoundRobin.ReadFromConfig(doubleConfigValidKey, Double.Parse, doubleConfigDefault);
             Assert.AreEqual(doubleReadValid, doubleConfigExpected);
 
         }
@@ -284,7 +284,7 @@ namespace Microsoft.HBase.Client.Tests
             var list = new List<string>();
             for (int i = 0; i < n; i++)
             {
-                list.Add(string.Format("http://{0}{1}:{2}", "workernode", i, 8090));
+                list.Add($"http://{"workernode"}{i}:{8090}");
             }
             return list;
         }
@@ -319,11 +319,11 @@ namespace Microsoft.HBase.Client.Tests
 
         private async Task<int> EmitIntAsync(int count)
         {
-            return await Task.FromResult<int>(count);
+            return await Task.FromResult(count);
         }
         private async Task NoOpTask()
         {
-            await Task.FromResult<int>(0);
+            await Task.FromResult(0);
         }
     }
 }

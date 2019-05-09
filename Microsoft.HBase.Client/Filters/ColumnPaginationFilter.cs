@@ -48,7 +48,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The limit.
         /// </value>
-        public int Limit { get; private set; }
+        public int Limit { get; }
 
         /// <summary>
         /// Gets the offset.
@@ -56,7 +56,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The offset.
         /// </value>
-        public int Offset { get; private set; }
+        public int Offset { get; }
 
         /// <inheritdoc/>
         public override string ToEncodedString()

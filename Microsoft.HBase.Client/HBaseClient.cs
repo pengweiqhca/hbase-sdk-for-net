@@ -1,48 +1,48 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
 namespace Microsoft.HBase.Client
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Net;
-    using System.Text;
-    using System.Threading.Tasks;
     using Microsoft.HBase.Client.Internal;
     using Microsoft.HBase.Client.LoadBalancing;
     using Microsoft.HBase.Client.Requester;
     using org.apache.hadoop.hbase.rest.protobuf.generated;
     using ProtoBuf;
-    using System.Globalization;
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Net;
+    using System.Net.Http;
+    using System.Text;
+    using System.Threading.Tasks;
 
     /// <summary>
-    /// A C# connector to HBase. 
+    /// A C# connector to HBase.
     /// </summary>
     /// <remarks>
     /// It currently targets HBase 0.96.2 and HDInsight 3.0 on Microsoft Azure.
     /// The communication works through HBase REST (StarGate) which uses ProtoBuf as a serialization format.
-    /// 
+    ///
     /// The usage is quite simple:
-    /// 
+    ///
     /// <code>
     /// var credentials = ClusterCredentials.FromFile("credentials.txt");
     /// var client = new HBaseClient(credentials);
     /// var version = await client.GetVersionAsync();
-    /// 
+    ///
     /// Console.WriteLine(version);
     /// </code>
     /// </remarks>
@@ -92,14 +92,7 @@ namespace Microsoft.HBase.Client
         {
             _globalRequestOptions = globalRequestOptions ?? RequestOptions.GetDefaultOptions();
             _globalRequestOptions.Validate();
-            if (credentials != null) // gateway mode
-            {
-                _requester = new GatewayWebRequester(credentials);
-            }
-            else // vnet mode
-            {
-                _requester = new VNetWebRequester(loadBalancer);
-            }
+            _requester = new VNetWebRequester(loadBalancer ?? new LoadBalancerRoundRobin(1));
         }
 
         /// <summary>
@@ -124,29 +117,25 @@ namespace Microsoft.HBase.Client
             {
                 if (response.WebResponse.StatusCode != HttpStatusCode.Created)
                 {
-                    using (var output = new StreamReader(response.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await response.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                            string.Format(
-                                "Couldn't create a scanner for table {0}! Response code was: {1}, expected 201! Response body was: {2}",
-                                tableName,
-                                response.WebResponse.StatusCode,
-                                message));
+                        throw new WebException($"Couldn't create a scanner for table {tableName}! Response code was: {response.WebResponse.StatusCode}, expected 201! Response body was: {message}");
                     }
                 }
-                string location = response.WebResponse.Headers.Get("Location");
+
+                var location = response.WebResponse.Headers.Location;
                 if (location == null)
                 {
                     throw new ArgumentException("Couldn't find header 'Location' in the response!");
                 }
 
-                return new ScannerInformation(new Uri(location), tableName, response.WebResponse.Headers);
+                return new ScannerInformation(location, tableName, response.WebResponse.Headers);
             }
         }
 
         /// <summary>
-        /// Deletes scanner.        
+        /// Deletes scanner.
         /// </summary>
         /// <param name="tableName">the table the scanner is associated with.</param>
         /// <param name="scannerInfo">the scanner information retrieved by #CreateScanner()</param>
@@ -165,16 +154,10 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
-                    using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                           string.Format(
-                              "Couldn't delete scanner {0} associated with {1} table.! Response code was: {2}, expected 200! Response body was: {3}",
-                              scannerInfo.ScannerId,
-                              tableName,
-                              webResponse.WebResponse.StatusCode,
-                              message));
+                        throw new WebException($"Couldn't delete scanner {scannerInfo.ScannerId} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
             }
@@ -205,16 +188,10 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
-                    using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                            string.Format(
-                                "Couldn't delete row {0} associated with {1} table.! Response code was: {2}, expected 200! Response body was: {3}",
-                                path,
-                                tableName,
-                                webResponse.WebResponse.StatusCode,
-                                message));
+                        throw new WebException($"Couldn't delete row {path} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
             }
@@ -253,15 +230,10 @@ namespace Microsoft.HBase.Client
                 }
 
                 // throw the exception otherwise
-                using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                 {
                     string message = output.ReadToEnd();
-                    throw new WebException(
-                       string.Format(
-                          "Couldn't create table {0}! Response code was: {1}, expected either 200 or 201! Response body was: {2}",
-                          schema.name,
-                          webResponse.WebResponse.StatusCode,
-                          message));
+                    throw new WebException($"Couldn't create table {schema.name}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
                 }
             }
         }
@@ -284,15 +256,10 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
-                    using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                            string.Format(
-                                "Couldn't delete table {0}! Response code was: {1}, expected 200! Response body was: {2}",
-                                table,
-                                webResponse.WebResponse.StatusCode,
-                                message));
+                        throw new WebException($"Couldn't delete table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
             }
@@ -337,7 +304,7 @@ namespace Microsoft.HBase.Client
 
             var optionToUse = options ?? _globalRequestOptions;
             string endpoint = tableName + "/multiget";
-            
+
             string query = null;
             for (var i = 0; i < rowKeys.Length; i++)
             {
@@ -349,7 +316,7 @@ namespace Microsoft.HBase.Client
 
                 query += prefix + "row=" + rowKeys[i];
             }
-            
+
             return await optionToUse.RetryPolicy.ExecuteAsync(() => GetRequestAndDeserializeAsync<CellSet>(endpoint, query, optionToUse));
         }
 
@@ -413,8 +380,8 @@ namespace Microsoft.HBase.Client
         }
 
         /// <summary>
-        /// Modifies a table schema. 
-        /// If necessary it creates a new table with the given schema. 
+        /// Modifies a table schema.
+        /// If necessary it creates a new table with the given schema.
         /// If something went wrong, a WebException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
@@ -434,15 +401,10 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK && webResponse.WebResponse.StatusCode != HttpStatusCode.Created)
                 {
-                    using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                            string.Format(
-                                "Couldn't modify table schema {0}! Response code was: {1}, expected either 200 or 201! Response body was: {2}",
-                                table,
-                                webResponse.WebResponse.StatusCode,
-                                message));
+                        throw new WebException($"Couldn't modify table schema {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
                     }
                 }
             }
@@ -467,7 +429,7 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    return Serializer.Deserialize<CellSet>(webResponse.WebResponse.GetResponseStream());
+                    return Serializer.Deserialize<CellSet>(await webResponse.WebResponse.Content.ReadAsStreamAsync());
                 }
 
                 return null;
@@ -488,7 +450,7 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    return ReadProtobufStream(webResponse.WebResponse.GetResponseStream());
+                    return ReadProtobufStream(await webResponse.WebResponse.Content.ReadAsStreamAsync());
                 }
 
                 return null;
@@ -598,15 +560,10 @@ namespace Microsoft.HBase.Client
 
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
                 {
-                    using (var output = new StreamReader(webResponse.WebResponse.GetResponseStream()))
+                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync()))
                     {
                         string message = output.ReadToEnd();
-                        throw new WebException(
-                           string.Format(
-                              "Couldn't insert into table {0}! Response code was: {1}, expected 200! Response body was: {2}",
-                              table,
-                              webResponse.WebResponse.StatusCode,
-                              message));
+                        throw new WebException($"Couldn't insert into table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
                     }
                 }
             }
@@ -616,11 +573,11 @@ namespace Microsoft.HBase.Client
         private async Task<Response> DeleteRequestAsync<TReq>(string endpoint, TReq request, RequestOptions options)
            where TReq : class
         {
-            return await ExecuteMethodAsync("DELETE", null, endpoint, request, options);
+            return await ExecuteMethodAsync(HttpMethod.Delete, null, endpoint, request, options);
         }
 
         private async Task<Response> ExecuteMethodAsync<TReq>(
-           string method,
+           HttpMethod method,
            string query,
            string endpoint,
            TReq request,
@@ -632,6 +589,7 @@ namespace Microsoft.HBase.Client
                 {
                     Serializer.Serialize(input, request);
                 }
+
                 input.Seek(0, SeekOrigin.Begin);
                 return await _requester.IssueWebRequestAsync(endpoint, query, method, input, options);
             }
@@ -641,9 +599,9 @@ namespace Microsoft.HBase.Client
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
-            using (Response response = await _requester.IssueWebRequestAsync(endpoint, query, "GET", null, options))
+            using (Response response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null, options))
             {
-                using (Stream responseStream = response.WebResponse.GetResponseStream())
+                using (Stream responseStream =await response.WebResponse.Content.ReadAsStreamAsync())
                 {
                     return Serializer.Deserialize<T>(responseStream);
                 }
@@ -654,7 +612,7 @@ namespace Microsoft.HBase.Client
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
-            return await _requester.IssueWebRequestAsync(endpoint, query, "GET", null, options);
+            return await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null, options);
         }
 
         private async Task<Response> PostRequestAsync<TReq>(string endpoint, TReq request, RequestOptions options)
@@ -662,7 +620,7 @@ namespace Microsoft.HBase.Client
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
-            return await ExecuteMethodAsync("POST", null, endpoint, request, options);
+            return await ExecuteMethodAsync(HttpMethod.Post, null, endpoint, request, options);
         }
 
         private async Task<Response> PutRequestAsync<TReq>(string endpoint, string query, TReq request, RequestOptions options)
@@ -670,7 +628,7 @@ namespace Microsoft.HBase.Client
         {
             options.ArgumentNotNull("request options");
             endpoint.ArgumentNotNull("endpoint");
-            return await ExecuteMethodAsync("PUT", query, endpoint, request, options);
+            return await ExecuteMethodAsync(HttpMethod.Put, query, endpoint, request, options);
         }
 
         /// <summary>

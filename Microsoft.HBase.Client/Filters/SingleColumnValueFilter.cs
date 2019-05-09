@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -65,7 +65,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="compareOp">The operator.</param>
         /// <param name="comparator">The comparator to use.</param>
         /// <param name="filterIfMissing">
-        /// When <c>true</c>, the entire row will be skipped if the column is not found; 
+        /// When <c>true</c>, the entire row will be skipped if the column is not found;
         /// when <c>false</c>, the row will pass if the column is not found.
         /// </param>
         /// <param name="latestVersion">
@@ -108,7 +108,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The comparator.
         /// </value>
-        public ByteArrayComparable Comparator { get; private set; }
+        public ByteArrayComparable Comparator { get; }
 
         /// <summary>
         /// Gets the compare operation.
@@ -116,7 +116,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The compare operation.
         /// </value>
-        public CompareFilter.CompareOp CompareOperation { get; private set; }
+        public CompareFilter.CompareOp CompareOperation { get; }
 
         /// <summary>
         /// Gets the name of the column family.
@@ -136,7 +136,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         ///   <c>true</c> if the entire row should be filtered if column is not found; otherwise, <c>false</c>.
         /// </value>
-        public bool FilterIfMissing { get; private set; }
+        public bool FilterIfMissing { get; }
 
         /// <summary>
         /// Gets a value indicating whether or not only the latest version will be tested.
@@ -145,7 +145,7 @@ namespace Microsoft.HBase.Client.Filters
         /// When <c>true</c>, the row will be returned if only the latest version of the column value matches;
         /// when <c>false</c>, the row will be returned if any version of the column value matches.
         /// </value>
-        public bool LatestVersion { get; private set; }
+        public bool LatestVersion { get; }
 
         /// <summary>
         /// Gets the name of the column qualifier.

@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -62,7 +62,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// An internal Method funneled to by other methods used to perform the underlying 
+        /// An internal Method funneled to by other methods used to perform the underlying
         /// reflection operation necessary to create a type dynamically given the type object
         /// that represents it.
         /// </summary>
@@ -195,11 +195,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Get's the value of a internal or non-internal property or field of an 
+        /// Get's the value of a internal or non-internal property or field of an
         /// object, when supplied by name.
         /// </summary>
         /// <param name = "instance">
-        /// The instance object from which the Field or Property should 
+        /// The instance object from which the Field or Property should
         /// be returned.
         /// </param>
         /// <param name = "name">
@@ -218,7 +218,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Get's the value of a static internal or non-internal property or field of an 
+        /// Get's the value of a static internal or non-internal property or field of an
         /// type, when supplied by name.
         /// </summary>
         /// <param name = "type">
@@ -236,11 +236,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Get's the value of a internal or non-internal property or field of an 
+        /// Get's the value of a internal or non-internal property or field of an
         /// object, when supplied by name.
         /// </summary>
         /// <param name = "expando">
-        /// The instance object from which the Field or Property should 
+        /// The instance object from which the Field or Property should
         /// be returned.
         /// </param>
         /// <param name = "name">
@@ -505,7 +505,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Represents an extended set of "primitive" types that
         /// includes types that are not primitives but so basic to
-        /// the CLR that they can generally be treated as primitives 
+        /// the CLR that they can generally be treated as primitives
         /// (even though they are not necessarily all value types).
         /// The extended set of primitives includes the set of actual
         /// primitives.
@@ -702,7 +702,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// The string to look for within the string to parse.
         /// </param>
         /// <returns>
-        /// The portion of the string that appears after the string to parse or 
+        /// The portion of the string that appears after the string to parse or
         /// the original string if the parse string was not found.
         /// </returns>
         internal static string SubstringAfter(this string inputValue, string searchValue)
@@ -730,7 +730,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// The string to look for within the string to parse.
         /// </param>
         /// <returns>
-        /// The portion of the string that appears before the string to parse or 
+        /// The portion of the string that appears before the string to parse or
         /// the original string if the parse string was not found.
         /// </returns>
         internal static string SubstringBefore(this string inputValue, string searchValue)
@@ -751,7 +751,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
 
         /// <summary>
-        /// Determines the compatibility of a match between a set of supplied 
+        /// Determines the compatibility of a match between a set of supplied
         /// parameters and a set of possible parameters for an overloaded function.
         /// </summary>
         /// <param name = "parameters">
@@ -779,8 +779,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             TestHelp.DoNothing(typeParameters);
 
-            int paramCount = parameters != null ? parameters.Count() : 0;
-            int objCount = values != null ? values.Count() : 0;
+            int paramCount = parameters?.Count() ?? 0;
+            int objCount = values?.Count() ?? 0;
             if (paramCount == 0 && objCount == 0)
             {
                 return int.MaxValue;
@@ -876,9 +876,9 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                             // Above check to see if method parameter is of type C<T>/C<U,V>.
 
                             // Since infoType is obtained from compile time information
-                            // it does not have T resolved. Hence we use infoType.Name 
+                            // it does not have T resolved. Hence we use infoType.Name
                             // which is in format C'1.
-                            // infoType.FullName is empty therefore it is not used.                            
+                            // infoType.FullName is empty therefore it is not used.
                             if (infoType.Name == objType.Name)
                             {
                                 retval += 3;
@@ -908,7 +908,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
 
 
         /// <summary>
-        /// Get's a Field or Property value from an object or type given the name of the desired 
+        /// Get's a Field or Property value from an object or type given the name of the desired
         /// Property or Field.
         /// </summary>
         /// <param name = "type">
@@ -975,7 +975,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Get's a Field value for an object give the FieldInfo for the 
+        /// Get's a Field value for an object give the FieldInfo for the
         /// desired field.
         /// </summary>
         /// <param name = "instance">
@@ -1024,16 +1024,16 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 // reflection will get caught and rethrown as a TargetInvocationException
                 // In these cases we want to have the inner exception sent up the
                 // stack so that the actual exception is presented to the test case.
-                // This code removes the TargetInvocationException and "fixes" the 
+                // This code removes the TargetInvocationException and "fixes" the
                 // call stack to match.
 
                 // Use reflections to get the inner field that holds the stack inside
                 // of an exception.
                 FieldInfo remoteStackTrace = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
 
-                // Set the InnerException._remoteStackTraceString            
+                // Set the InnerException._remoteStackTraceString
                 // to the current InnerException.StackTrace
-                // This "fixes" the stack trace so that it does not appear to originate 
+                // This "fixes" the stack trace so that it does not appear to originate
                 // from here when we re-throw the inner exception.
                 remoteStackTrace.SetValue(ex.InnerException, ex.InnerException.StackTrace + Environment.NewLine);
 

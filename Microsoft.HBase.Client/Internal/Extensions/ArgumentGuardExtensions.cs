@@ -53,7 +53,7 @@ namespace Microsoft.HBase.Client.Internal
         {
             if (value < 0)
             {
-                throw new ArgumentException(string.Format("Argument {0} wasn't >= 0! Given: {1}", name, value));
+                throw new ArgumentException($"Argument {name} wasn't >= 0! Given: {value}");
             }
         }
     }

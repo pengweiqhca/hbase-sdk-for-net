@@ -93,7 +93,7 @@ namespace Microsoft.HBase.Client.Filters
             rowFilters.ArgumentNotNull("rowFilters");
 
             _rowFilters = new List<Filter>();
-            foreach (Filter f in rowFilters)
+            foreach (var f in rowFilters)
             {
                 if (ReferenceEquals(f, null))
                 {
@@ -123,7 +123,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         /// The op.
         /// </value>
-        public Operator Op { get; private set; }
+        public Operator Op { get; }
 
         /// <summary>
         /// Adds the filter.
@@ -152,7 +152,7 @@ namespace Microsoft.HBase.Client.Filters
             }
 
             var working = new StringBuilder();
-            foreach (Filter f in _rowFilters)
+            foreach (var f in _rowFilters)
             {
                 working.AppendFormat(@"{0},", f.ToEncodedString());
             }

@@ -58,7 +58,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <value>
         ///   <c>true</c> if the dependent column should be dropped; otherwise, <c>false</c>.
         /// </value>
-        public bool DropDependentColumn { get; private set; }
+        public bool DropDependentColumn { get; }
 
         /// <summary>
         /// Gets the name of the column family.

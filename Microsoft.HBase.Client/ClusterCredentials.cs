@@ -122,7 +122,7 @@ namespace Microsoft.HBase.Client
         /// <value>
         /// The cluster URI.
         /// </value>
-        public Uri ClusterUri { get; private set; }
+        public Uri ClusterUri { get; }
 
         /// <summary>
         /// Gets the name of the user.
@@ -130,6 +130,6 @@ namespace Microsoft.HBase.Client
         /// <value>
         /// The name of the user.
         /// </value>
-        public string UserName { get; private set; }
+        public string UserName { get; }
     }
 }
