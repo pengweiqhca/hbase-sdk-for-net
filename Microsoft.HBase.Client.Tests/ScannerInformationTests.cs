@@ -15,11 +15,9 @@
 
 namespace Microsoft.HBase.Client.Tests
 {
-    using System;
-    using System.Net;
-    using System.Net.Http.Headers;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using System;
 
     // ReSharper disable InconsistentNaming
 

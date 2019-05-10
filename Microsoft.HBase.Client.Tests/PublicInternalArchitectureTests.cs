@@ -1,14 +1,13 @@
 ﻿namespace Microsoft.HBase.Client.Tests
 {
+    using Microsoft.HBase.Client.Tests.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
-    using Microsoft.HBase.Client.Tests.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     // ReSharper disable InconsistentNaming
-    // 
+    //
     [TestClass]
     public class PublicInternalArchitecturalTests:TestBase
     {

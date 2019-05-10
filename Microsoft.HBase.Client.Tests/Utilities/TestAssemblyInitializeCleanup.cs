@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -41,31 +41,19 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         }
 
         /// <summary>
-        /// Method that contains code to be executed before any tests in the assembly have run and allocate resources obtained by the assembly. 
+        /// Method that contains code to be executed before any tests in the assembly have run and allocate resources obtained by the assembly.
         /// </summary>
         /// <param Name="context"></param>
         [AssemblyInitialize]
         public static void AssemblyInitialize(TestContext context)
         {
-            // populate assemblies under test.
-            var types = new List<Type>();
-            types.Add(typeof(ClusterCredentials));
-            var assemblies = new List<Assembly>();
-            foreach (var t in types)
-            {
-                assemblies.Add(t.Assembly);
-            }
-
-            AssembliesUnderTest = assemblies.ToArray();
+            AssembliesUnderTest = new[] { typeof(HBaseClient).Assembly };
         }
 
         internal static IEnumerable<Assembly> AssembliesUnderTest { get; private set; }
 
 
-        internal static bool WindowsAzureStorageEmulatorStarted
-        {
-            get { return _windowsAzureStorageEmulatorStarted != 0; }
-        }
+        internal static bool WindowsAzureStorageEmulatorStarted => _windowsAzureStorageEmulatorStarted != 0;
 
 
         internal static void StartWindowsAzureStorageEmulatorIfNotAlreadyStarted()

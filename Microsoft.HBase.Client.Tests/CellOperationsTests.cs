@@ -13,10 +13,7 @@
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
-using Google.Protobuf;
-using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
 using System.Globalization;
-using System.Text;
 
 namespace Microsoft.HBase.Client.Tests
 {
@@ -26,8 +23,7 @@ namespace Microsoft.HBase.Client.Tests
     using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
     using System.Collections.Generic;
-    using System.Net;
-    using System.Text;
+    using System.Net.Http;
     using System.Threading.Tasks;
 
     [TestClass]
@@ -42,8 +38,6 @@ namespace Microsoft.HBase.Client.Tests
 
         private static bool _arrangementCompleted;
         private static readonly List<FilterTestRecord> AllExpectedRecords = new List<FilterTestRecord>();
-        private static ClusterCredentials _credentials;
-        private static readonly Encoding Encoding = Encoding.UTF8;
         private static string _tableName;
         private static TableSchema _tableSchema;
 
@@ -70,10 +64,9 @@ namespace Microsoft.HBase.Client.Tests
 
         private HBaseClient GetClient()
         {
-            _credentials = ClusterCredentialsFactory.CreateFromFile(@".\credentials.txt");
             var options = RequestOptions.GetDefaultOptions();
 
-            var client = new HBaseClient(_credentials, options);
+            var client = new HBaseClient(options);
             #region VNet
             //options.TimeoutMillis = 30000;
             //options.KeepAlive = false;
@@ -101,12 +94,9 @@ namespace Microsoft.HBase.Client.Tests
                 client.GetCellsAsync(_tableName, "1").Wait();
                 Assert.Fail("Expected to throw an exception as the row is deleted");
             }
-            catch(Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("1", "c1", "1A", 11))).Wait();
@@ -133,12 +123,9 @@ namespace Microsoft.HBase.Client.Tests
                 client.GetCellsAsync(_tableName, "2").Wait();
                 Assert.Fail("Expected to throw an exception as the row is deleted");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("2", "c1", "1A", 9))).Wait();
@@ -148,12 +135,9 @@ namespace Microsoft.HBase.Client.Tests
                 client.GetCellsAsync(_tableName, "2").Wait();
                 Assert.Fail("Expected to throw an exception as the row cannot be added with lower timestamp");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
         }
 
@@ -184,12 +168,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
@@ -199,12 +180,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 throw new AssertFailedException("Expected to throw an exception as the row cannot be added with lower timestamp than servers timestamp");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
         }
 
@@ -234,16 +212,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
-                else
-                {
-                    throw ex;
-                }
+                exception.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
@@ -254,12 +225,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
                 retrievedCells.Rows[0].Values[0].Column.ToStringUtf8().ShouldBeEqualOrdinalIgnoreCase("c1");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
         }
 
@@ -286,12 +254,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
@@ -301,12 +266,9 @@ namespace Microsoft.HBase.Client.Tests
                 retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
             }
-            catch (Exception ex)
+            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
             {
-                if (ex is AggregateException)
-                {
-                    ((ex.InnerException as WebException).Response as HttpWebResponse).StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-                }
+                exception.Message.ShouldContain("404");
             }
         }
 

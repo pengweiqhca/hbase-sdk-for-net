@@ -2,37 +2,23 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>net45;</TargetFrameworks>
+        <TargetFrameworks>net45;netcoreapp2.2</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Remove="Program.cs" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'" />
+
         <CodeAnalysisDictionary Include="..\FxCopCustomDictionary.xml">
             <Link>FxCopCustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
 
-        <ProjectReference Include="..\Microsoft.HBase.Client\Microsoft.HBase.Client.csproj">
-            <Project>{256f1a52-d499-4086-83b4-ae13a515ae1d}</Project>
-            <Name>Microsoft.HBase.Client</Name>
-        </ProjectReference>
+        <ProjectReference Include="..\Microsoft.HBase.Client\Microsoft.HBase.Client.csproj" />
 
-        <PackageReference Include="Microsoft.Bcl.Immutable">
-            <Version>1.0.34</Version>
-        </PackageReference>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
 
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-
-        <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
-        <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
-        <PackageReference Include="protobuf-net">
-            <Version>2.0.0.668</Version>
-        </PackageReference>
+        <PackageReference Include="MSTest.TestAdapter" Version="2.0-*" />
+        <PackageReference Include="MSTest.TestFramework" Version="2.0-*" />
         <Reference Include="System.Net.Http" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="credentials.txt">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>

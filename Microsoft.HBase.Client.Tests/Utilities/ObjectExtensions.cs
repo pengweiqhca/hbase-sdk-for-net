@@ -110,10 +110,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// <summary>
         /// Gets the known types within the system.
         /// </summary>
-        internal static IEnumerable<Type> KnownTypes
-        {
-            get { return knownTypes; }
-        }
+        internal static IEnumerable<Type> KnownTypes => knownTypes;
 
         /// <summary>
         /// Performs an as operation on the supplied object.

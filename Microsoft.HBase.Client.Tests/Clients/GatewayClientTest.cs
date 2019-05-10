@@ -15,6 +15,7 @@
 
 namespace Microsoft.HBase.Client.Tests.Clients
 {
+    using Google.Protobuf;
     using Microsoft.HBase.Client.LoadBalancing;
     using Microsoft.HBase.Client.Tests.Utilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,7 +24,6 @@ namespace Microsoft.HBase.Client.Tests.Clients
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Google.Protobuf;
 
     [TestClass]
     public class GatewayClientTest : HBaseClientTestBase
@@ -34,7 +34,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
             options.RetryPolicy = Policy.NoOpAsync();
             options.Timeout = TimeSpan.FromMilliseconds(30000);
             options.KeepAlive = false;
-            return new HBaseClient(ClusterCredentialsFactory.CreateFromFile(@".\credentials.txt"), options);
+            return new HBaseClient(options);
         }
 
         [TestMethod]

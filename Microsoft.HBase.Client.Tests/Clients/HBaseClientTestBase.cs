@@ -110,7 +110,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
 
             Trace.WriteLine(version);
 
-            version.StargateVersion.ShouldNotBeNullOrEmpty();
+            version.RestVersion.ShouldNotBeNullOrEmpty();
             version.JvmVersion.ShouldNotBeNullOrEmpty();
             version.OsVersion.ShouldNotBeNullOrEmpty();
             version.ServerVersion.ShouldNotBeNullOrEmpty();

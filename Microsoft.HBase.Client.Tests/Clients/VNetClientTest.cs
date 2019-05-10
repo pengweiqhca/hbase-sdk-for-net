@@ -38,7 +38,7 @@ namespace Microsoft.HBase.Client.Tests.Clients
             options.Port = 8090;
             options.AlternativeEndpoint = "";
 
-            return new HBaseClient(null, options, new LoadBalancerRoundRobin(regionServerIPs));
+            return new HBaseClient(options, new LoadBalancerRoundRobin(regionServerIPs));
         }
 
         [TestMethod]

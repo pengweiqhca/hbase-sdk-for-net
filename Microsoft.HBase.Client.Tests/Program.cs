@@ -1,23 +1,45 @@
 ﻿namespace Microsoft.HBase.Client.Tests
 {
     using System;
+    using System.Linq;
+    using Microsoft.HBase.Client.Tests.Utilities;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     class Program
     {
         static void Main()
         {
-            var a = new FilterTests();
+            foreach (var testClass in typeof(Program).Assembly.GetTypes()
+                .Where(type => type.GetCustomAttributesData().Any(attr => attr.AttributeType == typeof(TestClassAttribute))))
+                foreach (var testMethod in testClass.GetMethods().Where(m => m.GetCustomAttributesData()
+                    .Any(attr => attr.AttributeType == typeof(TestMethodAttribute))))
+                {
 
-            try
-            {
-                a.TestInitialize();
+                    var test = (TestBase)Activator.CreateInstance(testClass);
+                    try
+                    {
+                        test.TestInitialize();
 
-                a.When_I_Scan_all_I_get_the_expected_results();
-            }
-            finally
-            {
-                a.TestCleanup();
-            }
+                        testMethod.Invoke(test, null);
+
+                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {testClass.Name}.{testMethod.Name}");
+                    }
+                    catch
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+
+                        Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {testClass.Name}.{testMethod.Name}");
+
+                        Console.ResetColor();
+                    }
+                    finally
+                    {
+                        test.TestCleanup();
+
+                        if (test is IDisposable disposable)
+                            disposable.Dispose();
+                    }
+                }
         }
     }
 }

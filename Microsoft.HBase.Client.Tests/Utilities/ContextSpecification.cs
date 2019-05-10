@@ -32,13 +32,6 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
         }
 
-        /// <summary>
-        /// Acts on the context to create the observable condition.
-        /// </summary>
-        protected virtual void BecauseOf()
-        {
-        }
-
         /// <inheritdoc/>
         [TestInitialize]
         public override void TestInitialize()
@@ -46,7 +39,6 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             base.TestInitialize();
 
             Context();
-            BecauseOf();
         }
     }
 }

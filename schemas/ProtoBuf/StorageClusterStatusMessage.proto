@@ -1,0 +1,54 @@
+//
+// Licensed to the Apache Software Foundation (ASF) under one
+// or more contributor license agreements.  See the NOTICE file
+// distributed with this work for additional information
+// regarding copyright ownership.  The ASF licenses this file
+// to you under the Apache License, Version 2.0 (the
+// "License"); you may not use this file except in compliance
+// with the License.  You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package org.apache.hadoop.hbase.rest.protobuf.generated;
+
+message StorageClusterStatus {
+  message Region {
+    bytes name = 1;
+    int32 stores = 2;
+    int32 storefiles = 3;
+    int32 storefileSizeMB = 4;
+    int32 memStoreSizeMB = 5;
+    int64 storefileIndexSizeKB = 6;
+    int64 readRequestsCount = 7;
+    int64 writeRequestsCount = 8;
+    int32 rootIndexSizeKB = 9;
+    int32 totalStaticIndexSizeKB = 10;
+    int32 totalStaticBloomSizeKB = 11;
+    int64 totalCompactingKVs = 12;
+    int64 currentCompactedKVs = 13;
+    int64 cpRequestsCount = 14;
+  }
+  message Node {
+    string name = 1;    // name:port
+    int64 startCode = 2;
+    int64 requests = 3;
+    int32 heapSizeMB = 4;
+    int32 maxHeapSizeMB = 5;
+    repeated Region regions = 6;
+  }
+  // node status
+  repeated Node liveNodes = 1;
+  repeated string deadNodes = 2;
+  // summary statistics
+  int32 regions = 3;
+  int64 requests = 4;
+  double averageLoad = 5;
+}

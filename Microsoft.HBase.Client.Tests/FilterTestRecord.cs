@@ -1,7 +1,7 @@
 namespace Microsoft.HBase.Client.Tests
 {
-    using System;
     using Microsoft.HBase.Client.Internal;
+    using System;
 
     internal static class FilterTestRecordExtensions
     {

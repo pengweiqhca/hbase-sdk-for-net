@@ -66,10 +66,7 @@ namespace Microsoft.HBase.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="HBaseClient"/> class.
         /// </summary>
-        /// <param name="credentials">The credentials.</param>
-        public HBaseClient(ClusterCredentials credentials)
-            : this(credentials, RequestOptions.GetDefaultOptions())
-        { }
+        public HBaseClient() : this(RequestOptions.GetDefaultOptions()) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HBaseClient"/> class.
@@ -81,7 +78,7 @@ namespace Microsoft.HBase.Client
         /// <param name="numRegionServers">The number of region servers in the cluster.</param>
         /// <param name="clusterDomain">The fully-qualified domain name of the cluster.</param>
         public HBaseClient(int numRegionServers, string clusterDomain = null)
-            : this(null, RequestOptions.GetDefaultOptions(), new LoadBalancerRoundRobin(numRegionServers: numRegionServers, clusterDomain: clusterDomain))
+            : this(RequestOptions.GetDefaultOptions(), new LoadBalancerRoundRobin(numRegionServers: numRegionServers, clusterDomain: clusterDomain))
         { }
 
         /// <summary>
@@ -91,7 +88,7 @@ namespace Microsoft.HBase.Client
         /// <param name="globalRequestOptions">The global request options.</param>
         /// <param name="loadBalancer">load balancer for vnet modes</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "_requester disposed of in Dispose() if it is an IDisposable")]
-        public HBaseClient(ClusterCredentials credentials, RequestOptions globalRequestOptions = null, ILoadBalancer loadBalancer = null)
+        public HBaseClient(RequestOptions globalRequestOptions = null, ILoadBalancer loadBalancer = null)
         {
             _globalRequestOptions = globalRequestOptions ?? RequestOptions.GetDefaultOptions();
             _globalRequestOptions.Validate();
@@ -573,6 +570,8 @@ namespace Microsoft.HBase.Client
             endpoint.ArgumentNotNull("endpoint");
             using (var response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null, options))
             {
+                response.WebResponse.EnsureSuccessStatusCode();
+
                 using (var responseStream = await response.WebResponse.Content.ReadAsStreamAsync())
                 {
                     var parser = new MessageParser<T>(() => new T());

@@ -145,9 +145,7 @@ namespace Microsoft.HBase.Client.LoadBalancing
 
         internal static T ReadFromConfig<T>(string configKey, Func<string, T> parseConfigValue, T defaultValue)
         {
-            T result;
-
-            result = defaultValue;
+            var result = defaultValue;
 
             try
             {
