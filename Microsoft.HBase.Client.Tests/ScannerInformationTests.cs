@@ -16,54 +16,55 @@
 namespace Microsoft.HBase.Client.Tests
 {
     using Microsoft.HBase.Client.Tests.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using System;
+    using System.Net.Http;
 
     // ReSharper disable InconsistentNaming
 
-    [TestClass]
-    public class When_I_create_ScannerInformation : ContextSpecification
+
+    public class When_I_create_ScannerInformation : TestBase
     {
         private const string expectedScannerId = "/140614753560332aa73e8";
         private const string expectedTableName = "mytable";
         private readonly Uri expectedLocation = new Uri("https://headnodehost:8090/" + expectedTableName + "/scanner" + expectedScannerId);
         private ScannerInformation target;
 
-        protected override void Context()
+        public When_I_create_ScannerInformation()
         {
-            target = new ScannerInformation(expectedLocation, expectedTableName, null);
+            target = new ScannerInformation(expectedLocation, expectedTableName, new HttpResponseMessage().Headers);
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_have_the_expected_location()
         {
             target.Location.ShouldEqual(expectedLocation);
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_have_the_expected_scanner_identifier()
         {
             target.ScannerId.ShouldEqual(expectedScannerId.Substring(1));
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_have_the_expected_table_name()
         {
             target.TableName.ShouldEqual(expectedTableName);
         }
     }
 
-    [TestClass]
-    public class When_I_call_a_ScannerInformation_ctor : ContextSpecification
+
+    public class When_I_call_a_ScannerInformation_ctor : TestBase
     {
         private const string validTableName = "mytable";
         private readonly Uri validLocation = new Uri("https://headnodehost:8090/" + validTableName + "/scanner/140614753560332aa73e8");
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_reject_empty_table_names()
         {
             object instance = null;
@@ -71,8 +72,8 @@ namespace Microsoft.HBase.Client.Tests
             instance.ShouldBeNull();
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_reject_null_locations()
         {
             object instance = null;
@@ -80,8 +81,8 @@ namespace Microsoft.HBase.Client.Tests
             instance.ShouldBeNull();
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void It_should_reject_null_table_names()
         {
             object instance = null;

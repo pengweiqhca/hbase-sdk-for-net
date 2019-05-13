@@ -15,9 +15,10 @@
             <Link>FxCopCustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
 
+        <PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="3.*" PrivateAssets="All" />
         <PackageReference Include="Google.Protobuf" Version="3.7.0" />
         <PackageReference Include="Grpc.Tools" Version="1.20.1" PrivateAssets="All" />
-        <PackageReference Include="Polly-Signed" Version="5.9.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2019.*" PrivateAssets="All" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'" />
     </ItemGroup>
 

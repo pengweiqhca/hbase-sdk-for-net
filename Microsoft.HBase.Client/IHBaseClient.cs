@@ -15,9 +15,10 @@
 
 namespace Microsoft.HBase.Client
 {
-    using System.Threading.Tasks;
     using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     /// <summary>
     /// A C# connector to HBase.
     /// </summary>
@@ -47,24 +48,22 @@ namespace Microsoft.HBase.Client
         /// </summary>
         /// <param name="tableName">the table to scan</param>
         /// <param name="scannerSettings">the settings to e.g. set the batch size of this scan</param>
-        /// <param name="options">the request options, scan requests must set endpoint(Gateway mode) or host(VNET mode) to receive the scan request</param>
         /// <returns>A ScannerInformation which contains the continuation url/token and the table name</returns>
-        Task<ScannerInformation> CreateScannerAsync(string tableName, Scanner scannerSettings, RequestOptions options);
+        Task<ScannerInformation> CreateScannerAsync(string tableName, Scanner scannerSettings);
 
         /// <summary>
         /// Deletes scanner.
         /// </summary>
         /// <param name="tableName">the table the scanner is associated with.</param>
         /// <param name="scannerInfo">the scanner information retrieved by #CreateScanner()</param>
-        /// <param name="options">the request options, scan requests must set endpoint(Gateway mode) or host(VNET mode) to receive the scan request</param>
-        Task DeleteScannerAsync(string tableName, ScannerInformation scannerInfo, RequestOptions options);
+        Task DeleteScannerAsync(string tableName, ScannerInformation scannerInfo);
 
         /// <summary>
         /// Deletes row with specific row key.
         /// </summary>
         /// <param name="tableName">the table name</param>
         /// <param name="rowKey">the row to delete</param>
-        Task DeleteCellsAsync(string tableName, string rowKey, RequestOptions options = null);
+        Task DeleteCellsAsync(string tableName, string rowKey);
 
         /// <summary>
         /// Deletes row with specific row key and specific columnFamily and versions less than the mentioned one
@@ -73,21 +72,21 @@ namespace Microsoft.HBase.Client
         /// <param name="rowKey">the row to delete</param>
         /// <param name="columnFamily">the column family to delete</param>
         /// <param name="timestamp">timestamp's lower than this will be deleted for the row</param>
-        Task DeleteCellsAsync(string tableName, string rowKey, string columnFamily, long timestamp, RequestOptions options = null);
+        Task DeleteCellsAsync(string tableName, string rowKey, string columnFamily, long timestamp);
 
         /// <summary>
         /// Creates a table and/or fully replaces its schema.
         /// </summary>
         /// <param name="schema">the schema</param>
         /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a WebException.</returns>
-        Task<bool> CreateTableAsync(TableSchema schema, RequestOptions options = null);
+        Task<bool> CreateTableAsync(TableSchema schema);
 
         /// <summary>
         /// Deletes a table.
         /// If something went wrong, a WebException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
-        Task DeleteTableAsync(string table, RequestOptions options = null);
+        Task DeleteTableAsync(string table);
 
         /// <summary>
         /// Gets the cells asynchronously. Getting column value by columnName and getting multi-versions only work in VNET mode currently.
@@ -97,30 +96,29 @@ namespace Microsoft.HBase.Client
         /// <param name="columnName">familyname:columnname</param>
         /// <param name="numOfVersions">Number of versions to fetch</param>
         /// <returns></returns>
-        Task<CellSet> GetCellsAsync(string tableName, string rowKey, string columnName=null, string numOfVersions=null, RequestOptions options = null);
+        Task<CellSet> GetCellsAsync(string tableName, string rowKey, string columnName=null, string numOfVersions=null);
 
         /// <summary>
         /// Gets the cells asynchronous.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="rowKeys">The row keys.</param>
-        /// <param name="options">The options.</param>
         /// <returns></returns>
-        Task<CellSet> GetCellsAsync(string tableName, string[] rowKeys, RequestOptions options = null);
+        Task<CellSet> GetCellsAsync(string tableName, string[] rowKeys);
 
         /// <summary>
         /// Gets the storage cluster status asynchronous.
         /// </summary>
         /// <returns>
         /// </returns>
-        Task<StorageClusterStatus> GetStorageClusterStatusAsync(RequestOptions options = null);
+        Task<StorageClusterStatus> GetStorageClusterStatusAsync();
 
         /// <summary>
         /// Gets the table information asynchronously.
         /// </summary>
         /// <param name="table">The table.</param>
         /// <returns></returns>
-        Task<TableInfo> GetTableInfoAsync(string table, RequestOptions options = null);
+        Task<TableInfo> GetTableInfoAsync(string table);
 
         /// <summary>
         /// Gets the table schema asynchronously.
@@ -128,21 +126,21 @@ namespace Microsoft.HBase.Client
         /// <param name="table">The table.</param>
         /// <returns>
         /// </returns>
-        Task<TableSchema> GetTableSchemaAsync(string table, RequestOptions options = null);
+        Task<TableSchema> GetTableSchemaAsync(string table);
 
         /// <summary>
         /// Gets the version asynchronously.
         /// </summary>
         /// <returns>
         /// </returns>
-        Task<Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated.Version> GetVersionAsync(RequestOptions options = null);
+        Task<Version> GetVersionAsync();
 
         /// <summary>
         /// Lists the tables asynchronously.
         /// </summary>
         /// <returns>
         /// </returns>
-        Task<TableList> ListTablesAsync(RequestOptions options = null);
+        Task<TableList> ListTablesAsync();
 
         /// <summary>
         /// Modifies a table schema.
@@ -151,15 +149,14 @@ namespace Microsoft.HBase.Client
         /// </summary>
         /// <param name="table">the table name</param>
         /// <param name="schema">the schema</param>
-        Task ModifyTableSchemaAsync(string table, TableSchema schema, RequestOptions options = null);
+        Task ModifyTableSchemaAsync(string table, TableSchema schema);
 
         /// <summary>
         /// Scans the next set of messages.
         /// </summary>
         /// <param name="scannerInfo">the scanner information retrieved by #CreateScanner()</param>
-        /// <param name="options">the request options, scan requests must set endpoint(Gateway mode) or host(VNET mode) to receive the scan request</param>
         /// <returns>a cellset, or null if the scanner is exhausted</returns>
-        Task<CellSet> ScannerGetNextAsync(ScannerInformation scannerInfo, RequestOptions options);
+        Task<CellSet> ScannerGetNextAsync(ScannerInformation scannerInfo);
 
         /// <summary>
         /// Stores the given cells in the supplied table.
@@ -167,7 +164,7 @@ namespace Microsoft.HBase.Client
         /// <param name="table">the table</param>
         /// <param name="cells">the cells to insert</param>
         /// <returns>a task that is awaitable, signifying the end of this operation</returns>
-        Task StoreCellsAsync(string table, CellSet cells, RequestOptions options = null);
+        Task StoreCellsAsync(string table, CellSet cells);
 
         /// <summary>
         /// Automically checks if a row/family/qualifier value matches the expected value and updates
@@ -176,7 +173,7 @@ namespace Microsoft.HBase.Client
         /// <param name="row">row to update</param>
         /// <param name="cellToCheck">cell to check</param>
         /// <returns>true if the record was updated; false if condition failed at check</returns>
-        Task<bool> CheckAndPutAsync(string table, CellSet.Types.Row row, Cell cellToCheck, RequestOptions options = null);
+        Task<bool> CheckAndPutAsync(string table, CellSet.Types.Row row, Cell cellToCheck);
 
         /// <summary>
         /// Automically checks if a row/family/qualifier value matches the expected value and deletes
@@ -185,9 +182,8 @@ namespace Microsoft.HBase.Client
         /// <param name="cellToCheck">cell to check for deleting the row</param>
         /// <param name="row">row cells to delete</param>
         /// <returns>true if the record was deleted; false if condition failed at check</returns>
-        Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Types.Row row = null, RequestOptions options = null);
+        Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Types.Row row = null);
 
-
-        Task<IEnumerable<CellSet>> StatelessScannerAsync(string tableName, string optionalRowPrefix = null, string scanParameters = null, RequestOptions options = null);
+        Task<IEnumerable<CellSet>> StatelessScannerAsync(string tableName, string optionalRowPrefix = null, string scanParameters = null);
     }
 }

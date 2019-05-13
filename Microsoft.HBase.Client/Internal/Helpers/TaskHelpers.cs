@@ -35,10 +35,10 @@ namespace Microsoft.HBase.Client.Internal.Helpers
         {
             using (var cts = CreateLinkedCancellationTokenSource(token))
             {
-                if (task == await Task.WhenAny(task, Task.Delay(timeout, cts.Token)))
+                if (task == await Task.WhenAny(task, Task.Delay(timeout, cts.Token)).ConfigureAwait(false))
                 {
                     cts.Cancel();
-                    return await task;
+                    return await task.ConfigureAwait(false);
                 }
             }
 
@@ -61,10 +61,10 @@ namespace Microsoft.HBase.Client.Internal.Helpers
         {
             using (var cts = CreateLinkedCancellationTokenSource(token))
             {
-                if (task == await Task.WhenAny(task, Task.Delay(timeout, cts.Token)))
+                if (task == await Task.WhenAny(task, Task.Delay(timeout, cts.Token)).ConfigureAwait(false))
                 {
                     cts.Cancel();
-                    await task;
+                    await task.ConfigureAwait(false);
                     return;
                 }
             }

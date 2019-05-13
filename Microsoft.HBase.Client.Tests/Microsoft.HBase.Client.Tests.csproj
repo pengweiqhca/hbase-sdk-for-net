@@ -14,11 +14,14 @@
 
         <ProjectReference Include="..\Microsoft.HBase.Client\Microsoft.HBase.Client.csproj" />
 
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.1.0" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    </ItemGroup>
 
-        <PackageReference Include="MSTest.TestAdapter" Version="2.0-*" />
-        <PackageReference Include="MSTest.TestFramework" Version="2.0-*" />
-        <Reference Include="System.Net.Http" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" />
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+        <Reference Include="System.Configuration" />
+
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
 
 </Project>

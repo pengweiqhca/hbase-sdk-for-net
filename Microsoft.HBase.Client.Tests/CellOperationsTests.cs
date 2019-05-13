@@ -19,29 +19,26 @@ namespace Microsoft.HBase.Client.Tests
 {
     using Google.Protobuf;
     using Microsoft.HBase.Client.Tests.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
     using System;
-    using System.Collections.Generic;
+    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Xunit;
 
-    [TestClass]
+
     public class CellOperationsTests : DisposableContextSpecification
     {
         private const string TableNamePrefix = "celltest";
 
         private const string ColumnFamilyName1 = "first";
         private const string ColumnFamilyName2 = "second";
-        private const string ColumnNameA = "a";
-        private const string ColumnNameB = "b";
 
         private static bool _arrangementCompleted;
-        private static readonly List<FilterTestRecord> AllExpectedRecords = new List<FilterTestRecord>();
         private static string _tableName;
         private static TableSchema _tableSchema;
 
-        protected override void Context()
+        public CellOperationsTests()
         {
             if (!_arrangementCompleted)
             {
@@ -78,8 +75,7 @@ namespace Microsoft.HBase.Client.Tests
             return client;
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
         public void WhenIDeleteCellsWithTimeStampICanAddWithHigherTimestamp()
         {
             var client = GetClient();
@@ -92,9 +88,9 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 client.GetCellsAsync(_tableName, "1").Wait();
-                Assert.Fail("Expected to throw an exception as the row is deleted");
+                Assert.True(false, "Expected to throw an exception as the row is deleted");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
             {
                 exception.Message.ShouldContain("404");
             }
@@ -107,8 +103,8 @@ namespace Microsoft.HBase.Client.Tests
             retrievedCells.Rows[0].Values[0].Timestamp.ShouldEqual(11);
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void WhenIDeleteCellsWithTimeStampICannotAddWithLowerTimestamp()
         {
             var client = GetClient();
@@ -121,9 +117,9 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 client.GetCellsAsync(_tableName, "2").Wait();
-                Assert.Fail("Expected to throw an exception as the row is deleted");
+                Assert.True(false, "Expected to throw an exception as the row is deleted");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
             {
                 exception.Message.ShouldContain("404");
             }
@@ -133,17 +129,17 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 client.GetCellsAsync(_tableName, "2").Wait();
-                Assert.Fail("Expected to throw an exception as the row cannot be added with lower timestamp");
+                Assert.True(false, "Expected to throw an exception as the row cannot be added with lower timestamp");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
             {
                 exception.Message.ShouldContain("404");
             }
         }
 
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public async Task WhenICheckAndDeleteCellsWithTimeStampICannotAddWithLowerTimestampThanHbaseserver()
         {
             var client = GetClient();
@@ -151,7 +147,7 @@ namespace Microsoft.HBase.Client.Tests
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1A", 10))).Wait();
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
 
-            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3","c1","1A",10));
+            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10));
 
             deleted.ShouldEqual(true);
 
@@ -165,108 +161,106 @@ namespace Microsoft.HBase.Client.Tests
             try
             {
                 // All  cells are deleted so this should fail
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
+                await client.GetCellsAsync(_tableName, "3");
+                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (HttpRequestException ex)
             {
-                exception.Message.ShouldContain("404");
+                ex.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
             try
             {
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                throw new AssertFailedException("Expected to throw an exception as the row cannot be added with lower timestamp than servers timestamp");
+                await client.GetCellsAsync(_tableName, "3");
+                Assert.True(false, "Expected to throw an exception as the row cannot be added with lower timestamp than servers timestamp");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (HttpRequestException ex)
             {
-                exception.Message.ShouldContain("404");
+                ex.Message.ShouldContain("404");
             }
         }
 
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
-        [TestMethod]
+        [Fact]
         public async Task WhenICheckAndDeleteCellsWithTimeStampAndCellsToDeleteICanAddWithHigherTimestamp()
         {
             var client = GetClient();
 
-            client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1A", 10))).Wait();
-            client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
+            var cellSets = CreateCellSet(GetCellSet("3", "c1", "1A", 10), GetCellSet("3", "c2", "1A", 20));
+
+            await client.StoreCellsAsync(_tableName, cellSets);
 
             // Deletes all the ColumnFamily with timestamp less than 10
-            var rowToDelete = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8("3") };
-            //rowToDelete.Values.Add(GetCell(rowToDelete.Key, Column = BuildCellColumn(ColumnFamilyName1, "c1"), data= "1A", Timestamp = 10 });
-            rowToDelete.Values.Add(GetCell("3", "c1", "1A", 10));
-            rowToDelete.Values.Add(GetCell("3", "c2", "1A", 10));
-            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
+            var rowToDelete = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8("3") };
+            rowToDelete.Values.AddRange(cellSets.Rows.SelectMany(row => row.Values));
+            var deleted = await client.CheckAndDeleteAsync(_tableName, cellSets.Rows[0].Values[0], rowToDelete);
 
             deleted.ShouldEqual(true);
 
-            CellSet retrievedCells;
             try
             {
                 // All  cells are deleted so this should fail
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
+                await client.GetCellsAsync(_tableName, "3");
+                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (HttpRequestException ex)
             {
-                exception.Message.ShouldContain("404");
+                ex.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
             try
             {
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
+                var retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
                 retrievedCells.Rows[0].Values[0].Column.ToStringUtf8().ShouldBeEqualOrdinalIgnoreCase("c1");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
             {
                 exception.Message.ShouldContain("404");
             }
         }
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
-        [TestMethod]
+        [Fact]
         public async Task WhenICheckAndDeleteCellsWithColumnFamilyDeletesAllCells()
         {
             var client = GetClient();
 
-            client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1A", 10))).Wait();
-            client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c2", "1A", 10))).Wait();
+            var cellSets = CreateCellSet(GetCellSet("3", "c1", "1A", 10), GetCellSet("3", "c2", "1A", 20));
+
+            await client.StoreCellsAsync(_tableName, cellSets);
 
             // Deletes all the ColumnFamily with timestamp less than 10
-            var rowToDelete = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8("3") };
-            rowToDelete.Values.Add(new Cell() { Row = rowToDelete.Key, Column = ByteString.CopyFromUtf8(ColumnFamilyName1), Timestamp = 10 });
-            var deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c1", "1A", 10), rowToDelete);
+            var rowToDelete = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8("3") };
+            rowToDelete.Values.Add(new Cell { Row = rowToDelete.Key, Column = ByteString.CopyFromUtf8(ColumnFamilyName1), Timestamp = 10 });
+            var deleted = await client.CheckAndDeleteAsync(_tableName, cellSets.Rows[1].Values[0], rowToDelete);
 
             deleted.ShouldEqual(true);
 
-            CellSet retrievedCells;
             try
             {
                 // All  cells are deleted so this should fail
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                throw new AssertFailedException("expecting Get '3' to fail as all cells are removed");
+                await client.GetCellsAsync(_tableName, "3");
+                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (HttpRequestException ex)
             {
-                exception.Message.ShouldContain("404");
+                ex.Message.ShouldContain("404");
             }
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
             try
             {
-                retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
+                var retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
                 retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
             }
-            catch(AggregateException ex) when(ex.InnerException is HttpRequestException exception)
+            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
             {
                 exception.Message.ShouldContain("404");
             }
@@ -281,7 +275,7 @@ namespace Microsoft.HBase.Client.Tests
 
         private Cell GetCell(string key, string columnName, string value = null, long timestamp = 0)
         {
-            var cell = new Cell() { Column = BuildCellColumn(ColumnFamilyName1, columnName) , Row = ByteString.CopyFromUtf8(key) };
+            var cell = new Cell { Column = BuildCellColumn(ColumnFamilyName1, columnName), Row = ByteString.CopyFromUtf8(key) };
             if (value != null)
             {
                 cell.Data = ByteString.CopyFromUtf8(value);
@@ -294,8 +288,8 @@ namespace Microsoft.HBase.Client.Tests
         }
         private CellSet.Types.Row GetCellSet(string key, string columnName, string value, long timestamp)
         {
-            var row = new CellSet.Types.Row() { Key = ByteString.CopyFromUtf8(key) };
-            var c1 = new Cell() { Column = BuildCellColumn(ColumnFamilyName1, columnName ), Row = row.Key };
+            var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(key) };
+            var c1 = new Cell { Column = BuildCellColumn(ColumnFamilyName1, columnName), Row = row.Key };
             if (value != null)
             {
                 c1.Data = ByteString.CopyFromUtf8(value);
@@ -312,13 +306,6 @@ namespace Microsoft.HBase.Client.Tests
         private ByteString BuildCellColumn(string columnFamilyName, string columnName)
         {
             return ByteString.CopyFromUtf8(string.Format(CultureInfo.InvariantCulture, "{0}:{1}", columnFamilyName, columnName));
-        }
-
-        private string ExtractColumnName(ByteString cellColumn)
-        {
-            var qualifiedColumnName = cellColumn.ToStringUtf8();
-            var parts = qualifiedColumnName.Split(new[] { ':' }, 2);
-            return parts[1];
         }
 
         private void AddTable()

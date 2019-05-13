@@ -20,13 +20,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
     using System.Threading;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
 
     /// <summary>
-    /// A <see cref="ContextSpecification"/> that implements <see cref="IDisposable"/>.
+    /// A <see cref="TestBase"/> that implements <see cref="IDisposable"/>.
     /// </summary>
-    [TestClass]
-    public abstract class DisposableContextSpecification : ContextSpecification, IDisposable
+
+    public abstract class DisposableContextSpecification : TestBase, IDisposable
     {
         private int _disposed;
 

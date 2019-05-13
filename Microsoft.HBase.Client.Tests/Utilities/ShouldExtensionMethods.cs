@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -21,7 +21,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
     using System.Globalization;
     using System.Linq;
     using System.Text;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
 
     // ReSharper disable PossibleMultipleEnumeration
     // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -55,7 +55,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         /// The right object.
         /// </param>
         /// <returns>
-        /// A pair representing the converted objects (or null if no conversion could 
+        /// A pair representing the converted objects (or null if no conversion could
         /// be made).
         /// </returns>
         internal static Pair<object, object> EquateObjects(object left, object right)
@@ -88,7 +88,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 return EquateNumericObjects(left, right);
             }
 
-            // if left is numeric and right is a string, try to 
+            // if left is numeric and right is a string, try to
             // parse the string as a numeric.
             if (leftType.IsNumeric() && rightType == typeof(string))
             {
@@ -1390,7 +1390,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             var leftType = left.GetType();
             var rightType = right.GetType();
 
-            // If neither type is a ulong (or it is a ulong but is less that the value of long.MaxValue), 
+            // If neither type is a ulong (or it is a ulong but is less that the value of long.MaxValue),
             // then it is safe to cast both to long and all comparisons operations will work correctly.
             if (((leftType != typeof(ulong)) || (leftType == typeof(ulong) && left.CastTo<ulong>() <= long.MaxValue)) &&
                 ((rightType != typeof(ulong)) || (rightType == typeof(ulong) && right.CastTo<ulong>() <= long.MaxValue)))
@@ -1407,7 +1407,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             }
 
             // Otherwise the right object must be the ulong (because this function is never
-            // called if they are both the same type), so we can safely cast the left to 
+            // called if they are both the same type), so we can safely cast the left to
             // long and keep the right as a ulong (again, the comparison operation has
             // special handling for ulong types).
             return new Pair<object, object>(Convert.ToInt64(left, CultureInfo.InvariantCulture), right);
@@ -1425,14 +1425,14 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                     Convert.ToBoolean(left, CultureInfo.InvariantCulture), Convert.ToBoolean(right, CultureInfo.InvariantCulture));
             }
 
-            // Okay, here's the deal (from MSDN) on decimals, they have greater precision (after 
-            // the point) but a smaller range (before the decimal point).  Consequently, 
-            // double.MaxValue and float.MaxValue (or double.MinValue and float.MinValue) can not fit 
-            // into a decimal value.  As a result, we *have* to preference range over precision.  
-            // So we therefore first try to cast to double first, then to single, then finally decimal.  
+            // Okay, here's the deal (from MSDN) on decimals, they have greater precision (after
+            // the point) but a smaller range (before the decimal point).  Consequently,
+            // double.MaxValue and float.MaxValue (or double.MinValue and float.MinValue) can not fit
+            // into a decimal value.  As a result, we *have* to preference range over precision.
+            // So we therefore first try to cast to double first, then to single, then finally decimal.
 
-            // This hurts for decimal comparisons where precision is critical, but in that case, the 
-            // answer *has* be the calling test case should ensure that both are a decimal first, then 
+            // This hurts for decimal comparisons where precision is critical, but in that case, the
+            // answer *has* be the calling test case should ensure that both are a decimal first, then
             // do the comparison.  (As we have established, we only get to this point if both types
             // are not exactly the same going into the comparison).
 
@@ -1487,12 +1487,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (parameters.Any())
             {
-                return
-                    new AssertFailedException(
-                        string.Format(CultureInfo.InvariantCulture, message, parameters.Select(x => x.ToUsefulString()).Cast<object>().ToArray()));
+                Assert.True(false,
+                      string.Format(CultureInfo.InvariantCulture, message, parameters.Select(x => x.ToUsefulString()).Cast<object>().ToArray()));
             }
 
-            return new AssertFailedException(message);
+            Assert.True(false, message);
+
+            throw null;
         }
 
         private static bool NumericCompare(object left, object right, GeneralComparisonOperator comparisonOperator)
@@ -1500,7 +1501,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             var leftType = left.GetType();
             var rightType = right.GetType();
 
-            // There is no Reference Equality as that would have been handle by the caller, so we only have to 
+            // There is no Reference Equality as that would have been handle by the caller, so we only have to
             // deal with mathematical comparisons.
 
             // First let's deal with decimals (which is a special case floating point).
@@ -1534,17 +1535,17 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             // We only need to test one for ulong because the other can't be (we've handled the case where they both are).
             var leftIsUlong = left.Is<ulong>();
 
-            // Okay now the special case rules for ulong types.  We already know that both are not 
-            // ulong types (as that has already been handled).  The casting rules will only result with 
+            // Okay now the special case rules for ulong types.  We already know that both are not
+            // ulong types (as that has already been handled).  The casting rules will only result with
             // a ulong value if the value of the ulong was greater than long.MaxValue (otherwise it would
             // have simply been turned into a long).  Thus most of the comparisons are fairly simple)
             switch (comparisonOperator)
             {
-                    // They can not be equal because one is greater than long.MaxValue and the other is not.
+                // They can not be equal because one is greater than long.MaxValue and the other is not.
                 case GeneralComparisonOperator.Equal:
                     return false;
 
-                    // left is greater than (also greater than or equal) right if left was the ulong, otherwise it is not.
+                // left is greater than (also greater than or equal) right if left was the ulong, otherwise it is not.
                 case GeneralComparisonOperator.GreaterThan:
                 case GeneralComparisonOperator.GreaterThanOrEqual:
                     return leftIsUlong;
@@ -1553,8 +1554,8 @@ namespace Microsoft.HBase.Client.Tests.Utilities
                 case GeneralComparisonOperator.LessThanOrEqual:
                     return !leftIsUlong;
 
-                    // Only not equal remains, they must be not equal because one is greater than 
-                    // long.MaxValue and the other is not.
+                // Only not equal remains, they must be not equal because one is greater than
+                // long.MaxValue and the other is not.
                 default:
                     return true;
             }

@@ -15,53 +15,20 @@
 
 namespace Microsoft.HBase.Client.Tests.Utilities
 {
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Reflection;
 
-    [TestClass]
     public abstract class TestBase
     {
-        /// <summary>
-        /// Steps that are run after each test.
-        /// </summary>
-        [TestCleanup]
-        public virtual void TestCleanup()
-        {
-        }
-
-        /// <summary>
-        /// Steps that are run before each test.
-        /// </summary>
-        [TestInitialize]
-        public virtual void TestInitialize()
-        {
-            // reset the current directory to where the tests are running.
-
-            // ReSharper disable AssignNullToNotNullAttribute
-            Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            // ReSharper restore AssignNullToNotNullAttribute
-        }
-
-        /// <summary>
-        /// Gets or sets the test context which provides information about and functionality for the current test run.
-        /// </summary>
-        public TestContext TestContext { get; set; }
+        static TestBase() => Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
         /// <summary>
         /// Gets the collection of assemblies under test.
         /// </summary>
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        protected HashSet<Assembly> GetAssembliesUnderTest()
-        {
-            var rv = new HashSet<Assembly>();
-            foreach (var asm in TestAssemblyInitializeCleanup.AssembliesUnderTest)
-            {
-                 rv.Add(asm);
-            }
-            return rv;
-        }
+        protected HashSet<Assembly> GetAssembliesUnderTest() => new HashSet<Assembly> { typeof(HBaseClient).Assembly };
     }
 }

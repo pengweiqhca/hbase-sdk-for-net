@@ -1,18 +1,17 @@
 ﻿namespace Microsoft.HBase.Client.Tests
 {
     using Microsoft.HBase.Client.Tests.Utilities;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Xunit;
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     // ReSharper disable InconsistentNaming
     //
-    [TestClass]
-    public class PublicInternalArchitecturalTests:TestBase
+
+    public class PublicInternalArchitecturalTests : TestBase
     {
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
         public void All_declarations_not_under_an_internal_or_resources_namespace_are_public_or_nested()
         {
             var assemblies = GetAssembliesUnderTest().ToList();
@@ -48,8 +47,8 @@
             violatingTypes.ShouldContainOnly(new Type[] { });
         }
 
-        [TestMethod]
-        [TestCategory(TestRunMode.CheckIn)]
+        [Fact]
+
         public void All_declarations_under_an_internal_namespace_are_not_public()
         {
             var assemblies = GetAssembliesUnderTest().ToList();

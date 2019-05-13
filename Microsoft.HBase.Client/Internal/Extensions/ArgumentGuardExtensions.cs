@@ -40,10 +40,10 @@ namespace Microsoft.HBase.Client.Internal
             }
         }
 
-        internal static void ArgumentNotNullNorEmpty([ValidatedNotNull] this IEnumerable value, string paramName)
+        internal static void ArgumentNotNullNorEmpty<T>([ValidatedNotNull] this IEnumerable<T> value, string paramName)
         {
             value.ArgumentNotNull(paramName);
-            if (!value.Cast<object>().Any())
+            if (!value.Any())
             {
                 throw new ArgumentEmptyException(paramName ?? string.Empty, null, null);
             }

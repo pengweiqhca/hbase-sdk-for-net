@@ -15,14 +15,10 @@
 
 namespace Microsoft.HBase.Client.Requester
 {
-    using Microsoft.HBase.Client.LoadBalancing;
     using System;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
-    using System.Net;
     using System.Net.Http;
-    using System.Text;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -30,23 +26,34 @@ namespace Microsoft.HBase.Client.Requester
     /// </summary>
     public sealed class VNetWebRequester : IWebRequester
     {
-        private readonly ILoadBalancer _balancer;
         private readonly HttpClient _httpClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VNetWebRequester"/> class.
         /// </summary>
-        /// <param name="balancer">the load balancer for the vnet nodes</param>
+        /// <param name="options"></param>
         /// <param name="contentType">Type of the content.</param>
-        public VNetWebRequester(ILoadBalancer balancer, string contentType = "application/x-protobuf")
+        public VNetWebRequester(RequestOptions options, string contentType = "application/x-protobuf")
         {
-            _balancer = balancer;
+            options.Validate();
+
             _httpClient = new HttpClient(new HttpClientHandler
             {
+                AllowAutoRedirect = false,
                 PreAuthenticate = true,
-                AllowAutoRedirect = false
-            });
+            })
+            {
+                BaseAddress = options.BaseUri,
+                Timeout = options.Timeout,
+            };
+
             _httpClient.DefaultRequestHeaders.Accept.TryParseAdd(contentType);
+
+            if (options.AdditionalHeaders != null)
+                foreach (var kv in options.AdditionalHeaders)
+                {
+                    _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(kv.Key, kv.Value);
+                }
         }
 
         /// <summary>
@@ -56,92 +63,27 @@ namespace Microsoft.HBase.Client.Requester
         /// <param name="query"></param>
         /// <param name="method">The method.</param>
         /// <param name="input">The input.</param>
-        /// <param name="options">request options</param>
         /// <returns></returns>
-        public async Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input, RequestOptions options)
+        public async Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input)
         {
-            options.Validate();
             var watch = Stopwatch.StartNew();
-            Trace.CorrelationManager.ActivityId = Guid.NewGuid();
-            var balancedEndpoint = _balancer.GetEndpoint();
 
-            // Grab the host. Use the alternative host if one is specified
-            var host = options.AlternativeHost ?? balancedEndpoint.Host;
-
-            var builder = new UriBuilder(
-                balancedEndpoint.Scheme,
-                host,
-                balancedEndpoint.Port,
-                options.AlternativeEndpoint + endpoint);
-
-            if (query != null)
+            using (var request = new HttpRequestMessage(method, string.IsNullOrEmpty(query) ? endpoint : $"{endpoint}?{query}"))
             {
-                builder.Query = query;
-            }
-
-            var target = builder.Uri;
-
-            try
-            {
-                Debug.WriteLine("Issuing request {0} to endpoint {1}", Trace.CorrelationManager.ActivityId, target);
-
-                var httpWebRequest = new HttpRequestMessage(method, target);
-
-                if (options.AdditionalHeaders != null)
-                {
-                    foreach (var kv in options.AdditionalHeaders)
-                    {
-                        httpWebRequest.Headers.Add(kv.Key, kv.Value);
-                    }
-                }
-
-
                 if (input != null)
-                {
-                    httpWebRequest.Content = new ByteArrayContent(input) { Headers = { ContentType = _httpClient.DefaultRequestHeaders.Accept.First() } };
-                }
+                    request.Content = new ByteArrayContent(input) { Headers = { ContentType = _httpClient.DefaultRequestHeaders.Accept.First() } };
 
-                var response = await _httpClient.SendAsync(httpWebRequest);
+                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
 
-                return new Response()
-                {
-                    WebResponse = response,
-                    RequestLatency = watch.Elapsed,
-                    PostRequestAction = (r) =>
-                    {
-                        if (r.WebResponse.StatusCode == HttpStatusCode.OK || r.WebResponse.StatusCode == HttpStatusCode.Created || r.WebResponse.StatusCode == HttpStatusCode.NotModified)
-                        {
-                            _balancer.RecordSuccess(balancedEndpoint);
-                        }
-                        else
-                        {
-                            _balancer.RecordFailure(balancedEndpoint);
-                        }
-                    }
-                };
+                return new Response { WebResponse = response, RequestLatency = watch.Elapsed };
             }
-            catch (WebException we)
-            {
-                // 404 is valid response
-                var resp = we.Response as HttpWebResponse;
-                if (resp.StatusCode == HttpStatusCode.NotFound)
-                {
-                    _balancer.RecordSuccess(balancedEndpoint);
-                    Debug.WriteLine("Web request {0} to endpoint {1} successful!", Trace.CorrelationManager.ActivityId, target);
-                }
-                else
-                {
-                    _balancer.RecordFailure(balancedEndpoint);
-                    Debug.WriteLine("Web request {0} to endpoint {1} failed!", Trace.CorrelationManager.ActivityId, target);
-                }
-                throw we;
-            }
-            catch (Exception e)
-            {
-                _balancer.RecordFailure(balancedEndpoint);
-                Debug.WriteLine("Web request {0} to endpoint {1} failed!", Trace.CorrelationManager.ActivityId, target);
-                throw e;
-            }
+        }
+
+        public void Dispose()
+        {
+            _httpClient.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

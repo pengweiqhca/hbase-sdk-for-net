@@ -16,13 +16,12 @@
 namespace Microsoft.HBase.Client.Requester
 {
     using System;
-    using System.IO;
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    public interface IWebRequester
+    public interface IWebRequester : IDisposable
     {
-        Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input, RequestOptions options);
+        Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input);
     }
 
     public class Response : IDisposable

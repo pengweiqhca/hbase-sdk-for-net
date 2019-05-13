@@ -15,48 +15,29 @@
 
 namespace Microsoft.HBase.Client
 {
+    using Microsoft.HBase.Client.Internal;
     using System;
     using System.Collections.Generic;
-    using Microsoft.HBase.Client.Internal;
-    using Microsoft.HBase.Client.LoadBalancing;
-    using Polly;
-    using Polly.Retry;
+    using System.Configuration;
 
     public class RequestOptions
     {
-        public IAsyncPolicy RetryPolicy { get; set; }
-        public string AlternativeEndpoint { get; set; }
-        public bool KeepAlive { get; set; }
         public TimeSpan Timeout { get; set; }
-        public int SerializationBufferSize { get; set; }
-        public int ReceiveBufferSize { get; set; }
-        public bool UseNagle { get; set; }
-        public int Port { get; set; }
         public Dictionary<string, string> AdditionalHeaders { get; set; }
-        public string AlternativeHost { get; set; }
+        public Uri BaseUri { get; set; }
 
         public void Validate()
         {
-            RetryPolicy.ArgumentNotNull("RetryPolicy");
+            BaseUri.ArgumentNotNull("RetryPolicy");
             ArgumentGuardExtensions.ArgumentNotNegative((int)Timeout.TotalMilliseconds, "TimeoutMillis");
-            ArgumentGuardExtensions.ArgumentNotNegative(ReceiveBufferSize, "ReceiveBufferSize");
-            ArgumentGuardExtensions.ArgumentNotNegative(SerializationBufferSize, "SerializationBufferSize");
-            ArgumentGuardExtensions.ArgumentNotNegative(Port, "Port");
         }
 
         public static RequestOptions GetDefaultOptions()
         {
-            return new RequestOptions()
+            return new RequestOptions
             {
-                RetryPolicy = Policy.NoOpAsync(),
-                KeepAlive = true,
-                Timeout = TimeSpan.FromMilliseconds(30000),
-                ReceiveBufferSize = 1024 * 1024 * 1,
-                SerializationBufferSize = 1024 * 1024 * 1,
-                UseNagle = false,
-                //AlternativeEndpoint = Constants.RestEndpointBase,
-                Port = 443,
-                AlternativeHost = null
+                Timeout = TimeSpan.FromMilliseconds(int.TryParse(ConfigurationManager.AppSettings[Constants.HBaseTimeout], out var timeout) ? timeout : 30000),
+                BaseUri = Uri.TryCreate(ConfigurationManager.AppSettings[Constants.HBaseBaseUri], UriKind.Absolute, out var uri) ? uri : null
             };
         }
 

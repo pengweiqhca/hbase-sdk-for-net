@@ -45,10 +45,7 @@ namespace Microsoft.HBase.Client.Internal
             }
             catch (Exception)
             {
-                if (!ReferenceEquals(rv, null))
-                {
-                    rv.Dispose();
-                }
+                rv?.Dispose();
                 throw;
             }
             return rv;
@@ -83,10 +80,7 @@ namespace Microsoft.HBase.Client.Internal
             }
             catch (Exception)
             {
-                if (!ReferenceEquals(rv, null))
-                {
-                    rv.Dispose();
-                }
+                rv?.Dispose();
                 throw;
             }
 
