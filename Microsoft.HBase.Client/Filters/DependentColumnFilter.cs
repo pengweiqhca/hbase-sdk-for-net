@@ -44,8 +44,8 @@ namespace Microsoft.HBase.Client.Filters
             CompareOp valueCompareOp,
             ByteArrayComparable valueComparator) : base(valueCompareOp, valueComparator)
         {
-            family.ArgumentNotNull("family");
-            qualifier.ArgumentNotNull("qualifier");
+            family.ArgumentNotNull(nameof(family));
+            qualifier.ArgumentNotNull(nameof(qualifier));
 
             _family = (byte[])family.Clone();
             _qualifier = (byte[])qualifier.Clone();

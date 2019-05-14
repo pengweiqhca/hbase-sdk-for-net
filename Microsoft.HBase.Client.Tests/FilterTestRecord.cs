@@ -7,19 +7,19 @@ namespace Microsoft.HBase.Client.Tests
     {
         internal static FilterTestRecord WithAValue(this FilterTestRecord value, string a)
         {
-            value.ArgumentNotNull("value");
+            value.ArgumentNotNull(nameof(value));
             return new FilterTestRecord(value.RowKey, value.LineNumber, a, value.B);
         }
 
         internal static FilterTestRecord WithBValue(this FilterTestRecord value, string b)
         {
-            value.ArgumentNotNull("value");
+            value.ArgumentNotNull(nameof(value));
             return new FilterTestRecord(value.RowKey, value.LineNumber, value.A, b);
         }
 
         internal static FilterTestRecord WithLineNumberValue(this FilterTestRecord value, int lineNumber)
         {
-            value.ArgumentNotNull("value");
+            value.ArgumentNotNull(nameof(value));
             return new FilterTestRecord(value.RowKey, lineNumber, value.A, value.B);
         }
     }

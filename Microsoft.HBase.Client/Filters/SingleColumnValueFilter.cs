@@ -83,15 +83,15 @@ namespace Microsoft.HBase.Client.Filters
             bool filterIfMissing = false,
             bool latestVersion = true)
         {
-            family.ArgumentNotNull("family");
-            qualifier.ArgumentNotNull("qualifier");
+            family.ArgumentNotNull(nameof(family));
+            qualifier.ArgumentNotNull(nameof(qualifier));
 
             if (!Enum.IsDefined(typeof(CompareFilter.CompareOp), compareOp))
             {
-                throw new InvalidEnumArgumentException("compareOp", (int)compareOp, typeof(CompareFilter.CompareOp));
+                throw new InvalidEnumArgumentException(nameof(compareOp), (int)compareOp, typeof(CompareFilter.CompareOp));
             }
 
-            comparator.ArgumentNotNull("comparator");
+            comparator.ArgumentNotNull(nameof(comparator));
 
             _family = (byte[])family.Clone();
             _qualifier = (byte[])qualifier.Clone();

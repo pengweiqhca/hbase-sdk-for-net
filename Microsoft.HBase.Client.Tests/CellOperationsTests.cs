@@ -61,7 +61,7 @@ namespace Microsoft.HBase.Client.Tests
 
         private HBaseClient GetClient()
         {
-            var options = RequestOptions.GetDefaultOptions();
+            var options = RequestOptionsFactory.GetDefaultOptions();
 
             var client = new HBaseClient(options);
             #region VNet

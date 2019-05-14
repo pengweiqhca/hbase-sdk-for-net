@@ -33,7 +33,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="prefixes">The prefixes.</param>
         public MultipleColumnPrefixFilter(IEnumerable<byte[]> prefixes)
         {
-            prefixes.ArgumentNotNull("prefixes");
+            prefixes.ArgumentNotNull(nameof(prefixes));
 
             _prefixes = new HashSet<byte[]>(new ByteArrayEqualityComparer());
             foreach (var p in prefixes)
@@ -75,7 +75,7 @@ namespace Microsoft.HBase.Client.Filters
 
         internal string ToCsvStringWithDoubleQuotedEncodedValues(IEnumerable<byte[]> values)
         {
-            values.ArgumentNotNull("values");
+            values.ArgumentNotNull(nameof(values));
 
             var working = new StringBuilder();
             foreach (var v in values)

@@ -33,7 +33,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="prefix">The prefix.</param>
         public ColumnPrefixFilter(byte[] prefix)
         {
-            prefix.ArgumentNotNull("prefix");
+            prefix.ArgumentNotNull(nameof(prefix));
 
             _prefix = (byte[])prefix.Clone();
         }

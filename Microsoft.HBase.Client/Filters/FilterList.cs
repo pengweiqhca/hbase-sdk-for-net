@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation
 // All rights reserved.
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License.  You may obtain a copy
 // of the License at http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // THIS CODE IS PROVIDED *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
 // WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
 // MERCHANTABLITY OR NON-INFRINGEMENT.
-// 
+//
 // See the Apache Version 2.0 License for specific language governing
 // permissions and limitations under the License.
 
@@ -25,7 +25,7 @@ namespace Microsoft.HBase.Client.Filters
     using Microsoft.HBase.Client.Internal;
 
     /// <summary>
-    /// Implementation of <see cref="Filter"/> that represents an ordered List of Filters which will be evaluated with a specified boolean operator 
+    /// Implementation of <see cref="Filter"/> that represents an ordered List of Filters which will be evaluated with a specified boolean operator
     /// FilterList.Operator.MUST_PASS_ALL (AND) or FilterList.Operator.MUST_PASS_ONE (OR).
     /// </summary>
     public class FilterList : Filter
@@ -87,10 +87,10 @@ namespace Microsoft.HBase.Client.Filters
         {
             if (!Enum.IsDefined(typeof(Operator), op))
             {
-                throw new InvalidEnumArgumentException("op", (int)op, typeof(Operator));
+                throw new InvalidEnumArgumentException(nameof(op), (int)op, typeof(Operator));
             }
 
-            rowFilters.ArgumentNotNull("rowFilters");
+            rowFilters.ArgumentNotNull(nameof(rowFilters));
 
             _rowFilters = new List<Filter>();
             foreach (var f in rowFilters)
@@ -131,7 +131,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="filter">The filter.</param>
         public void AddFilter(Filter filter)
         {
-            filter.ArgumentNotNull("filter");
+            filter.ArgumentNotNull(nameof(filter));
 
             _rowFilters.Add(filter);
         }

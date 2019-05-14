@@ -62,12 +62,12 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (left == null)
             {
-                throw new ArgumentNullException("left");
+                throw new ArgumentNullException(nameof(left));
             }
 
             if (right == null)
             {
-                throw new ArgumentNullException("right");
+                throw new ArgumentNullException(nameof(right));
             }
 
 
@@ -317,13 +317,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             if (actual.Kind == DateTimeKind.Unspecified && expected.Kind != DateTimeKind.Unspecified)
             {
                 // NEIN: throwing ArgumentException, create a specific exception.
-                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", "actual");
+                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", nameof(actual));
             }
 
             if (actual.Kind != DateTimeKind.Unspecified && expected.Kind == DateTimeKind.Unspecified)
             {
                 // NEIN: throwing ArgumentException, create a specific exception.
-                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", "expected");
+                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", nameof(expected));
             }
 
             if (Math.Abs(actual.ToUniversalTime().Ticks - expected.ToUniversalTime().Ticks) > tolerance.Ticks)
@@ -365,7 +365,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -547,7 +547,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -675,11 +675,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (actual == null)
             {
-                throw new ArgumentNullException("actual");
+                throw new ArgumentNullException(nameof(actual));
             }
             if (subset == null)
             {
-                throw new ArgumentNullException("subset");
+                throw new ArgumentNullException(nameof(subset));
             }
 
             var comparer = new AssertEqualityComparer<T>();
@@ -817,7 +817,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -845,7 +845,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             actual.ShouldNotBeNull();
@@ -880,11 +880,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (actual == null)
             {
-                throw new ArgumentNullException("actual");
+                throw new ArgumentNullException(nameof(actual));
             }
             if (items == null)
             {
-                throw new ArgumentNullException("items");
+                throw new ArgumentNullException(nameof(items));
             }
 
             var source = new List<T>(actual);
@@ -939,7 +939,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -1052,11 +1052,11 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             }
             if (actual == null)
             {
-                throw new ArgumentNullException("actual");
+                throw new ArgumentNullException(nameof(actual));
             }
 
             var actualType = actual.GetType();
@@ -1080,12 +1080,12 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (actual == null)
             {
-                throw new ArgumentNullException("actual");
+                throw new ArgumentNullException(nameof(actual));
             }
 
             if (types == null)
             {
-                throw new ArgumentNullException("types");
+                throw new ArgumentNullException(nameof(types));
             }
 
             var actualType = actual.GetType();
@@ -1141,7 +1141,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (references == null)
             {
-                throw new ArgumentNullException("references");
+                throw new ArgumentNullException(nameof(references));
             }
 
             foreach (var item in references)
@@ -1164,7 +1164,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -1255,7 +1255,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (expected == null)
             {
-                throw new ArgumentNullException("expected");
+                throw new ArgumentNullException(nameof(expected));
             }
 
             if (actual == null)
@@ -1283,13 +1283,13 @@ namespace Microsoft.HBase.Client.Tests.Utilities
             if (left.Kind == DateTimeKind.Unspecified && right.Kind != DateTimeKind.Unspecified)
             {
                 // NEIN: throwing ArgumentException, create a specific exception.
-                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", "left");
+                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", nameof(left));
             }
 
             if (left.Kind != DateTimeKind.Unspecified && right.Kind == DateTimeKind.Unspecified)
             {
                 // NEIN: throwing ArgumentException, create a specific exception.
-                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", "right");
+                throw new ArgumentException("DateTimeKind.Unspecified is only supported when both comparands are unspecified.", nameof(right));
             }
 
             left = left.ToUniversalTime();

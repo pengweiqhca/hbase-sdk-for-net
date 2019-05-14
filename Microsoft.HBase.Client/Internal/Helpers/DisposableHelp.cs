@@ -71,7 +71,7 @@ namespace Microsoft.HBase.Client.Internal
         /// </returns>
         internal static T SafeCreate<T>(Func<T> factory) where T : class, IDisposable
         {
-            factory.ArgumentNotNull("factory");
+            factory.ArgumentNotNull(nameof(factory));
 
             T rv = null;
             try

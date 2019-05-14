@@ -209,7 +209,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
             return Get(instance.GetType(), instance, name);
         }
@@ -299,7 +299,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
 
             const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -362,7 +362,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
             const BindingFlags bindings = BindingFlags.InvokeMethod | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             var type = instance.GetType();
@@ -517,7 +517,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (inputValue == null)
             {
-                throw new ArgumentNullException("inputValue");
+                throw new ArgumentNullException(nameof(inputValue));
             }
 
             return inputValue.IsPrimitive || ExtendedPrimitives.Contains(inputValue);
@@ -600,7 +600,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (parameterInfo == null)
             {
-                throw new ArgumentNullException("parameterInfo");
+                throw new ArgumentNullException(nameof(parameterInfo));
             }
 
             return parameterInfo.GetCustomAttributes(true).Where(a => a.GetType() == typeof(ParamArrayAttribute)).Count() > 0;
@@ -650,7 +650,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
             Set(instance.GetType(), instance, name, value);
         }
@@ -706,7 +706,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (inputValue == null)
             {
-                throw new ArgumentNullException("inputValue");
+                throw new ArgumentNullException(nameof(inputValue));
             }
             var loc = inputValue.IndexOfOi(searchValue);
             if (loc >= 0 && loc < inputValue.Length + 1)
@@ -734,7 +734,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (inputValue == null)
             {
-                throw new ArgumentNullException("inputValue");
+                throw new ArgumentNullException(nameof(inputValue));
             }
 
             var loc = inputValue.IndexOfOi(searchValue);

@@ -24,16 +24,16 @@ namespace Microsoft.HBase.Client.Requester
     /// <summary>
     ///
     /// </summary>
-    public sealed class VNetWebRequester : IWebRequester
+    public sealed class WebRequester : IWebRequester
     {
         private readonly HttpClient _httpClient;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VNetWebRequester"/> class.
+        /// Initializes a new instance of the <see cref="WebRequester"/> class.
         /// </summary>
         /// <param name="options"></param>
         /// <param name="contentType">Type of the content.</param>
-        public VNetWebRequester(RequestOptions options, string contentType = "application/x-protobuf")
+        public WebRequester(RequestOptions options, string contentType = "application/x-protobuf")
         {
             options.Validate();
 

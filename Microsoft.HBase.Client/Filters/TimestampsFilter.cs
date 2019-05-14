@@ -38,7 +38,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="timestamps">The timestamps.</param>
         public TimestampsFilter(IEnumerable<long> timestamps)
         {
-            timestamps.ArgumentNotNull("timestamps");
+            timestamps.ArgumentNotNull(nameof(timestamps));
 
             _timestamps = new HashSet<long>(timestamps);
         }
@@ -63,7 +63,7 @@ namespace Microsoft.HBase.Client.Filters
 
         internal string ToCsvStringWithDoubleQuotedValues(IEnumerable<long> values)
         {
-            values.ArgumentNotNull("values");
+            values.ArgumentNotNull(nameof(values));
 
             var working = new StringBuilder();
             foreach (var v in values)

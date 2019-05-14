@@ -16,6 +16,7 @@
 namespace Microsoft.HBase.Client
 {
     using Google.Protobuf;
+    using JetBrains.Annotations;
     using Microsoft.HBase.Client.Internal;
     using Microsoft.HBase.Client.Requester;
     using Org.Apache.Hadoop.Hbase.Rest.Protobuf.Generated;
@@ -48,7 +49,7 @@ namespace Microsoft.HBase.Client
     /// </remarks>
     public sealed class HBaseClient : IHBaseClient, IDisposable
     {
-        private IWebRequester _requester;
+        private readonly IWebRequester _requester;
 
         private const string CheckAndPutQuery = "check=put";
         private const string CheckAndDeleteQuery = "check=delete";
@@ -62,16 +63,13 @@ namespace Microsoft.HBase.Client
         /// <summary>
         /// Initializes a new instance of the <see cref="HBaseClient"/> class.
         /// </summary>
-        public HBaseClient() : this(RequestOptions.GetDefaultOptions()) { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HBaseClient"/> class.
-        /// </summary>
-        /// <param name="globalRequestOptions">The global request options.</param>
+        /// <param name="options">The global request options.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope", Justification = "_requester disposed of in Dispose() if it is an IDisposable")]
-        public HBaseClient(RequestOptions globalRequestOptions)
+        public HBaseClient([NotNull] RequestOptions options)
         {
-            _requester = new VNetWebRequester(globalRequestOptions ?? RequestOptions.GetDefaultOptions());
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            _requester = new WebRequester(options);
         }
 
         /// <summary>
@@ -83,8 +81,8 @@ namespace Microsoft.HBase.Client
         /// <returns>A ScannerInformation which contains the continuation url/token and the table name</returns>
         public async Task<ScannerInformation> CreateScannerAsync(string tableName, Scanner scannerSettings)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            scannerSettings.ArgumentNotNull("scannerSettings");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            scannerSettings.ArgumentNotNull(nameof(scannerSettings));
 
             using (var response = await PostRequestAsync(tableName + "/scanner", scannerSettings).ConfigureAwait(false))
             {
@@ -114,8 +112,8 @@ namespace Microsoft.HBase.Client
         /// <param name="scannerInfo">the scanner information retrieved by #CreateScanner()</param>
         public async Task DeleteScannerAsync(string tableName, ScannerInformation scannerInfo)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            scannerInfo.ArgumentNotNull("scannerInfo");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            scannerInfo.ArgumentNotNull(nameof(scannerInfo));
 
             using (var webResponse = await DeleteRequestAsync<Scanner>(tableName + "/scanner/" + scannerInfo.ScannerId, null).ConfigureAwait(false))
             {
@@ -132,17 +130,17 @@ namespace Microsoft.HBase.Client
 
         public Task DeleteCellsAsync(string tableName, string rowKey)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            rowKey.ArgumentNotNullNorEmpty("rowKey");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            rowKey.ArgumentNotNullNorEmpty(nameof(rowKey));
 
             return DeleteCellsAsyncInternal(tableName, rowKey);
         }
 
         public Task DeleteCellsAsync(string tableName, string rowKey, string columnFamily, long timestamp)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            rowKey.ArgumentNotNullNorEmpty("rowKey");
-            columnFamily.ArgumentNotNullNorEmpty("columnFamily");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            rowKey.ArgumentNotNullNorEmpty(nameof(rowKey));
+            columnFamily.ArgumentNotNullNorEmpty(nameof(columnFamily));
 
             return DeleteCellsAsyncInternal(tableName, string.Format(CultureInfo.InvariantCulture, RowKeyColumnFamilyTimeStampFormat, rowKey, columnFamily, timestamp));
         }
@@ -169,11 +167,11 @@ namespace Microsoft.HBase.Client
         /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a WebException.</returns>
         public async Task<bool> CreateTableAsync(TableSchema schema)
         {
-            schema.ArgumentNotNull("schema");
+            schema.ArgumentNotNull(nameof(schema));
 
             if (string.IsNullOrEmpty(schema.Name))
             {
-                throw new ArgumentException("schema.Name was either null or empty!", "schema");
+                throw new ArgumentException("schema.Name was either null or empty!", nameof(schema));
             }
 
             using (var webResponse = await PutRequestAsync(schema.Name + "/schema", null, schema).ConfigureAwait(false))
@@ -205,7 +203,7 @@ namespace Microsoft.HBase.Client
         /// <param name="table">the table name</param>
         public Task DeleteTableAsync(string table)
         {
-            table.ArgumentNotNullNorEmpty("table");
+            table.ArgumentNotNullNorEmpty(nameof(table));
 
             return DeleteTableAsyncInternal(table);
         }
@@ -235,8 +233,8 @@ namespace Microsoft.HBase.Client
         /// <returns></returns>
         public Task<CellSet> GetCellsAsync(string tableName, string rowKey, string columnName = null, string numOfVersions = null)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            rowKey.ArgumentNotNull("rowKey");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            rowKey.ArgumentNotNull(nameof(rowKey));
 
             var endpoint = tableName + "/" + rowKey;
             if (columnName != null)
@@ -260,8 +258,8 @@ namespace Microsoft.HBase.Client
         /// <returns>A cell set</returns>
         public Task<CellSet> GetCellsAsync(string tableName, string[] rowKeys)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            rowKeys.ArgumentNotNull("rowKey");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            rowKeys.ArgumentNotNull(nameof(rowKeys));
 
             var endpoint = tableName + "/multiget";
 
@@ -330,8 +328,8 @@ namespace Microsoft.HBase.Client
         /// <param name="schema">the schema</param>
         public async Task ModifyTableSchemaAsync(string table, TableSchema schema)
         {
-            table.ArgumentNotNullNorEmpty("table");
-            schema.ArgumentNotNull("schema");
+            table.ArgumentNotNullNorEmpty(nameof(table));
+            schema.ArgumentNotNull(nameof(schema));
 
             using (var webResponse = await PostRequestAsync(table + "/schema", schema).ConfigureAwait(false))
             {
@@ -352,7 +350,7 @@ namespace Microsoft.HBase.Client
         /// <returns>a cellset, or null if the scanner is exhausted</returns>
         public async Task<CellSet> ScannerGetNextAsync(ScannerInformation scannerInfo)
         {
-            scannerInfo.ArgumentNotNull("scannerInfo");
+            scannerInfo.ArgumentNotNull(nameof(scannerInfo));
 
             using (var webResponse = await GetRequestAsync(scannerInfo.TableName + "/scanner/" + scannerInfo.ScannerId, null).ConfigureAwait(false))
             {
@@ -362,7 +360,7 @@ namespace Microsoft.HBase.Client
 
         public async Task<IEnumerable<CellSet>> StatelessScannerAsync(string tableName, string optionalRowPrefix = null, string scanParameters = null)
         {
-            tableName.ArgumentNotNullNorEmpty("tableName");
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
 
             using (var webResponse = await GetRequestAsync(tableName + "/" + optionalRowPrefix + "*", scanParameters).ConfigureAwait(false))
             {
@@ -382,8 +380,8 @@ namespace Microsoft.HBase.Client
         /// <returns>true if the record was updated; false if condition failed at check</returns>
         public Task<bool> CheckAndPutAsync(string table, CellSet.Types.Row row, Cell cellToCheck)
         {
-            table.ArgumentNotNullNorEmpty("table");
-            row.ArgumentNotNull("row");
+            table.ArgumentNotNullNorEmpty(nameof(table));
+            row.ArgumentNotNull(nameof(row));
             row.Values.Add(cellToCheck);
             var cellSet = new CellSet();
             cellSet.Rows.Add(row);
@@ -400,12 +398,12 @@ namespace Microsoft.HBase.Client
         /// <returns>true if the record was deleted; false if condition failed at check</returns>
         public Task<bool> CheckAndDeleteAsync(string table, Cell cellToCheck, CellSet.Types.Row rowToDelete = null)
         {
-            table.ArgumentNotNullNorEmpty("table");
-            cellToCheck.ArgumentNotNull("cellToCheck");
+            table.ArgumentNotNullNorEmpty(nameof(table));
+            cellToCheck.ArgumentNotNull(nameof(cellToCheck));
 
             if (rowToDelete == null) return CheckAndDeleteAsyncInternal(cellToCheck, cellToCheck.Row);
 
-            rowToDelete.Values.ArgumentNotNullNorEmpty("rowToDelete");
+            rowToDelete.Values.ArgumentNotNullNorEmpty(nameof(rowToDelete));
 
             if (rowToDelete.Values.Count == 1) return CheckAndDeleteAsyncInternal(rowToDelete.Values[0], rowToDelete.Key);
 
@@ -432,8 +430,8 @@ namespace Microsoft.HBase.Client
         /// <returns>a task that is awaitable, signifying the end of this operation</returns>
         public Task StoreCellsAsync(string table, CellSet cells)
         {
-            table.ArgumentNotNullNorEmpty("table");
-            cells.ArgumentNotNull("cells");
+            table.ArgumentNotNullNorEmpty(nameof(table));
+            cells.ArgumentNotNull(nameof(cells));
 
             return StoreCellsAsyncInternal(table, cells);
         }
@@ -464,14 +462,14 @@ namespace Microsoft.HBase.Client
 
         private Task<Response> ExecuteMethodAsync<TReq>(HttpMethod method, string query, string endpoint, TReq request) where TReq : IMessage<TReq>
         {
-            endpoint.ArgumentNotNull("endpoint");
+            endpoint.ArgumentNotNull(nameof(endpoint));
 
             return _requester.IssueWebRequestAsync(endpoint, query, method, request?.ToByteArray());
         }
 
         private async Task<T> GetRequestAndDeserializeAsync<T>(string endpoint, string query) where T : IMessage<T>, new()
         {
-            endpoint.ArgumentNotNull("endpoint");
+            endpoint.ArgumentNotNull(nameof(endpoint));
 
             using (var response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null).ConfigureAwait(false))
             {
@@ -488,7 +486,7 @@ namespace Microsoft.HBase.Client
 
         private Task<Response> GetRequestAsync(string endpoint, string query)
         {
-            endpoint.ArgumentNotNull("endpoint");
+            endpoint.ArgumentNotNull(nameof(endpoint));
 
             return _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null);
         }
@@ -510,15 +508,10 @@ namespace Microsoft.HBase.Client
         /// </remarks>
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                if (_requester != null)
-                {
-                    _requester.Dispose();
-                    _requester = null;
-                }
-                _disposed = true;
-            }
+            if (_disposed) return;
+
+            _requester?.Dispose();
+            _disposed = true;
         }
     }
 }

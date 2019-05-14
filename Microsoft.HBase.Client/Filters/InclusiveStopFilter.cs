@@ -33,7 +33,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="stopRowKey">The stop row key.</param>
         public InclusiveStopFilter(byte[] stopRowKey)
         {
-            stopRowKey.ArgumentNotNull("stopRowKey");
+            stopRowKey.ArgumentNotNull(nameof(stopRowKey));
 
             _stopRowKey = (byte[])stopRowKey.Clone();
         }

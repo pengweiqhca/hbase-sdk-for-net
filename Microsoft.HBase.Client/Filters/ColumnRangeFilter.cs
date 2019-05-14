@@ -37,8 +37,8 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="maxColumnInclusive">if set to <c>true</c> include the maximum column in the range.</param>
         public ColumnRangeFilter(byte[] minColumn, bool minColumnInclusive, byte[] maxColumn, bool maxColumnInclusive)
         {
-            minColumn.ArgumentNotNull("minColumn");
-            maxColumn.ArgumentNotNull("maxColumn");
+            minColumn.ArgumentNotNull(nameof(minColumn));
+            maxColumn.ArgumentNotNull(nameof(maxColumn));
 
             _minColumn = (byte[])minColumn.Clone();
             MinColumnInclusive = minColumnInclusive;

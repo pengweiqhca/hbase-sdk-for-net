@@ -28,7 +28,7 @@ namespace Microsoft.HBase.Client.Filters
         /// <param name="filter">The filter.</param>
         public WhileMatchFilter(Filter filter)
         {
-            filter.ArgumentNotNull("filter");
+            filter.ArgumentNotNull(nameof(filter));
 
             Filter = filter;
         }

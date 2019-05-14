@@ -78,7 +78,7 @@ namespace Microsoft.HBase.Client.Internal
                     return "XOR";
 
                 default:
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(BitComparator.BitwiseOp));
+                    throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(BitComparator.BitwiseOp));
             }
         }
 
@@ -108,7 +108,7 @@ namespace Microsoft.HBase.Client.Internal
                     return "LESS_OR_EQUAL";
 
                 default:
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(CompareFilter.CompareOp));
+                    throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(CompareFilter.CompareOp));
             }
         }
 
@@ -123,7 +123,7 @@ namespace Microsoft.HBase.Client.Internal
                     return "MUST_PASS_ONE";
 
                 default:
-                    throw new InvalidEnumArgumentException("value", (int)value, typeof(FilterList.Operator));
+                    throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(FilterList.Operator));
             }
         }
     }

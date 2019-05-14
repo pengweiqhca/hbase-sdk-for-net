@@ -34,9 +34,9 @@ namespace Microsoft.HBase.Client
         /// <param name="responseHeaderCollection">additional header information from the response</param>
         public ScannerInformation(Uri location, string tableName, HttpResponseHeaders responseHeaderCollection)
         {
-            location.ArgumentNotNull("location");
-            tableName.ArgumentNotNullNorEmpty("tableName");
-            responseHeaderCollection.ArgumentNotNull("responseHeaderCollection");
+            location.ArgumentNotNull(nameof(location));
+            tableName.ArgumentNotNullNorEmpty(nameof(tableName));
+            responseHeaderCollection.ArgumentNotNull(nameof(responseHeaderCollection));
 
             Location = location;
             TableName = tableName;

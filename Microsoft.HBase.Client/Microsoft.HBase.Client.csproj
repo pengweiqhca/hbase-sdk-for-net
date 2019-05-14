@@ -2,11 +2,14 @@
 
     <PropertyGroup>
         <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>../snk.snk</AssemblyOriginatorKeyFile>
+        <PackageId>Microsoft.HBase.Client.TuhuFork</PackageId>
     </PropertyGroup>
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>Microsoft.HBase.Client.Tests</_Parameter1>
+            <_Parameter1>Microsoft.HBase.Client.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001009d123965da9f9ea5f36dace9efdf811f0970975ad27cdd5640df0778074bac75ade5c700117808114f6109670a2bd39b0d829da942c134ebab3ecdc6353dfe8199171dc19887d9dd246c1acdccecf38f708397d35a5351d81edbd571795a54f81ec8752471fbdc0d5160eab9f64634e41217e6054d7c47ca79f01d0eb5000fb1</_Parameter1>
         </AssemblyAttribute>
 
         <Protobuf Include="..\schemas\ProtoBuf\*" Link="ProtoBuf/%(FileName)" />
@@ -19,7 +22,6 @@
         <PackageReference Include="Google.Protobuf" Version="3.7.0" />
         <PackageReference Include="Grpc.Tools" Version="1.20.1" PrivateAssets="All" />
         <PackageReference Include="JetBrains.Annotations" Version="2019.*" PrivateAssets="All" />
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">

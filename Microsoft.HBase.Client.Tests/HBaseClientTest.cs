@@ -62,7 +62,7 @@ namespace Microsoft.HBase.Client.Tests
 
         public IHBaseClient CreateClient()
         {
-            var options = RequestOptions.GetDefaultOptions();
+            var options = RequestOptionsFactory.GetDefaultOptions();
             options.Timeout = TimeSpan.FromMilliseconds(30000);
             return new HBaseClient(options);
         }

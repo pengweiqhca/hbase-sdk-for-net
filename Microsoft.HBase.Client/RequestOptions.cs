@@ -18,7 +18,6 @@ namespace Microsoft.HBase.Client
     using Microsoft.HBase.Client.Internal;
     using System;
     using System.Collections.Generic;
-    using System.Configuration;
 
     public class RequestOptions
     {
@@ -28,18 +27,8 @@ namespace Microsoft.HBase.Client
 
         public void Validate()
         {
-            BaseUri.ArgumentNotNull("RetryPolicy");
-            ArgumentGuardExtensions.ArgumentNotNegative((int)Timeout.TotalMilliseconds, "TimeoutMillis");
+            BaseUri.ArgumentNotNull(nameof(BaseUri));
+            ArgumentGuardExtensions.ArgumentNotNegative((int)Timeout.TotalMilliseconds, nameof(Timeout));
         }
-
-        public static RequestOptions GetDefaultOptions()
-        {
-            return new RequestOptions
-            {
-                Timeout = TimeSpan.FromMilliseconds(int.TryParse(ConfigurationManager.AppSettings[Constants.HBaseTimeout], out var timeout) ? timeout : 30000),
-                BaseUri = Uri.TryCreate(ConfigurationManager.AppSettings[Constants.HBaseBaseUri], UriKind.Absolute, out var uri) ? uri : null
-            };
-        }
-
     }
 }

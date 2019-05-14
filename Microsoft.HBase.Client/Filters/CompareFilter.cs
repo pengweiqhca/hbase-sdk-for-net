@@ -74,10 +74,10 @@ namespace Microsoft.HBase.Client.Filters
         {
             if (!Enum.IsDefined(typeof(CompareOp), compareOp))
             {
-                throw new InvalidEnumArgumentException("compareOp", (int)compareOp, typeof(CompareOp));
+                throw new InvalidEnumArgumentException(nameof(compareOp), (int)compareOp, typeof(CompareOp));
             }
 
-            comparator.ArgumentNotNull("comparator");
+            comparator.ArgumentNotNull(nameof(comparator));
 
             CompareOperation = compareOp;
             Comparator = comparator;

@@ -50,7 +50,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (ReferenceEquals(thisValue, null))
             {
-                throw new ArgumentNullException("thisValue");
+                throw new ArgumentNullException(nameof(thisValue));
             }
             else
             {
@@ -62,7 +62,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (ReferenceEquals(thisValue, null))
             {
-                throw new ArgumentNullException("thisValue");
+                throw new ArgumentNullException(nameof(thisValue));
             }
             else
             {
@@ -84,7 +84,7 @@ namespace Microsoft.HBase.Client.Tests.Utilities
         {
             if (ReferenceEquals(value, null))
             {
-                throw new ArgumentNullException("value");
+                throw new ArgumentNullException(nameof(value));
             }
             bool result;
             if (bool.TryParse(value, out result))
