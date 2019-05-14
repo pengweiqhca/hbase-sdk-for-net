@@ -78,12 +78,12 @@ namespace Microsoft.HBase.Client
         /// Creates a table and/or fully replaces its schema.
         /// </summary>
         /// <param name="schema">the schema</param>
-        /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a WebException.</returns>
+        /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a HttpRequestException.</returns>
         Task<bool> CreateTableAsync(TableSchema schema);
 
         /// <summary>
         /// Deletes a table.
-        /// If something went wrong, a WebException is thrown.
+        /// If something went wrong, a HttpRequestException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
         Task DeleteTableAsync(string table);
@@ -145,7 +145,7 @@ namespace Microsoft.HBase.Client
         /// <summary>
         /// Modifies a table schema.
         /// If necessary it creates a new table with the given schema.
-        /// If something went wrong, a WebException is thrown.
+        /// If something went wrong, a HttpRequestException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
         /// <param name="schema">the schema</param>

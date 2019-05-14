@@ -87,19 +87,11 @@ namespace Microsoft.HBase.Client
             using (var response = await PostRequestAsync(tableName + "/scanner", scannerSettings).ConfigureAwait(false))
             {
                 if (response.WebResponse.StatusCode != HttpStatusCode.Created)
-                {
-                    using (var output = new StreamReader(await response.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        var message = output.ReadToEnd();
-                        throw new WebException($"Couldn't create a scanner for table {tableName}! Response code was: {response.WebResponse.StatusCode}, expected 201! Response body was: {message}");
-                    }
-                }
+                    throw new HttpRequestException($"Couldn't create a scanner for table {tableName}! Response code was: {response.WebResponse.StatusCode}, expected 201! Response body was: {await response.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
 
                 var location = response.WebResponse.Headers.Location;
                 if (location == null)
-                {
                     throw new ArgumentException("Couldn't find header 'Location' in the response!");
-                }
 
                 return new ScannerInformation(location, tableName, response.WebResponse.Headers);
             }
@@ -118,13 +110,7 @@ namespace Microsoft.HBase.Client
             using (var webResponse = await DeleteRequestAsync<Scanner>(tableName + "/scanner/" + scannerInfo.ScannerId, null).ConfigureAwait(false))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        var message = output.ReadToEnd();
-                        throw new WebException($"Couldn't delete scanner {scannerInfo.ScannerId} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
-                    }
-                }
+                    throw new HttpRequestException($"Couldn't delete scanner {scannerInfo.ScannerId} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
         }
 
@@ -150,13 +136,7 @@ namespace Microsoft.HBase.Client
             using (var webResponse = await DeleteRequestAsync<Scanner>(tableName + "/" + path, null).ConfigureAwait(false))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        var message = output.ReadToEnd();
-                        throw new WebException($"Couldn't delete row {path} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
-                    }
-                }
+                    throw new HttpRequestException($"Couldn't delete row {path} associated with {tableName} table.! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
         }
 
@@ -164,7 +144,7 @@ namespace Microsoft.HBase.Client
         /// Creates a table and/or fully replaces its schema.
         /// </summary>
         /// <param name="schema">the schema</param>
-        /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a WebException.</returns>
+        /// <returns>returns true if the table was created, false if the table already exists. In case of any other error it throws a HttpRequestException.</returns>
         public async Task<bool> CreateTableAsync(TableSchema schema)
         {
             schema.ArgumentNotNull(nameof(schema));
@@ -176,29 +156,18 @@ namespace Microsoft.HBase.Client
 
             using (var webResponse = await PutRequestAsync(schema.Name + "/schema", null, schema).ConfigureAwait(false))
             {
-                if (webResponse.WebResponse.StatusCode == HttpStatusCode.Created)
-                {
-                    return true;
-                }
+                if (webResponse.WebResponse.StatusCode == HttpStatusCode.Created) return true;
 
                 // table already exits
-                if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK)
-                {
-                    return false;
-                }
+                if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK) return false;
 
-                // throw the exception otherwise
-                using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                {
-                    var message = output.ReadToEnd();
-                    throw new WebException($"Couldn't create table {schema.Name}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
-                }
+                throw new HttpRequestException($"Couldn't create table {schema.Name}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
         }
 
         /// <summary>
         /// Deletes a table.
-        /// If something went wrong, a WebException is thrown.
+        /// If something went wrong, a HttpRequestException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
         public Task DeleteTableAsync(string table)
@@ -213,13 +182,7 @@ namespace Microsoft.HBase.Client
             using (var webResponse = await DeleteRequestAsync<TableSchema>(table + "/schema", null).ConfigureAwait(false))
             {
                 if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        var message = output.ReadToEnd();
-                        throw new WebException($"Couldn't delete table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
-                    }
-                }
+                    throw new HttpRequestException($"Couldn't delete table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
         }
 
@@ -322,7 +285,7 @@ namespace Microsoft.HBase.Client
         /// <summary>
         /// Modifies a table schema.
         /// If necessary it creates a new table with the given schema.
-        /// If something went wrong, a WebException is thrown.
+        /// If something went wrong, a HttpRequestException is thrown.
         /// </summary>
         /// <param name="table">the table name</param>
         /// <param name="schema">the schema</param>
@@ -335,11 +298,7 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK || webResponse.WebResponse.StatusCode == HttpStatusCode.Created) return;
 
-                using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                {
-                    var message = output.ReadToEnd();
-                    throw new WebException($"Couldn't modify table schema {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {message}");
-                }
+                throw new HttpRequestException($"Couldn't modify table schema {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected either 200 or 201! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
         }
 
@@ -444,16 +403,10 @@ namespace Microsoft.HBase.Client
             {
                 if (webResponse.WebResponse.StatusCode == HttpStatusCode.NotModified) return false;
 
-                if (webResponse.WebResponse.StatusCode != HttpStatusCode.OK)
-                {
-                    using (var output = new StreamReader(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)))
-                    {
-                        var message = output.ReadToEnd();
-                        throw new WebException($"Couldn't insert into table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {message}");
-                    }
-                }
+                if (webResponse.WebResponse.StatusCode == HttpStatusCode.OK) return true;
+
+                throw new HttpRequestException($"Couldn't insert into table {table}! Response code was: {webResponse.WebResponse.StatusCode}, expected 200! Response body was: {await webResponse.WebResponse.Content.ReadAsStringAsync().ConfigureAwait(false)}");
             }
-            return true;
         }
 
         private Task<Response> DeleteRequestAsync<TReq>(string endpoint, TReq request)
