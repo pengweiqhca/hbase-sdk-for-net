@@ -24,6 +24,7 @@ namespace Microsoft.HBase.Client.Tests
     using System.Linq;
     using System.Net.Http;
     using System.Text;
+    using System.Threading.Tasks;
     using Xunit;
 
     public class HBaseClientTest : DisposableContextSpecification
@@ -106,35 +107,27 @@ namespace Microsoft.HBase.Client.Tests
         }
 
         [Fact]
-        public void TestCellsDeletion()
+        public async Task TestCellsDeletion()
         {
             const string testKey = "content";
             const string testValue = "the force is strong in this column";
 
-            try
-            {
-                var client = CreateClient();
-                var set = new CellSet();
-                var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey) };
-                set.Rows.Add(row);
+            var client = CreateClient();
+            var set = new CellSet();
+            var row = new CellSet.Types.Row { Key = ByteString.CopyFromUtf8(testKey) };
+            set.Rows.Add(row);
 
-                var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
-                row.Values.Add(value);
+            var value = new Cell { Column = ByteString.CopyFromUtf8("d:starwars"), Data = ByteString.CopyFromUtf8(testValue) };
+            row.Values.Add(value);
 
-                client.StoreCellsAsync(TestTableName, set).Wait();
-                var cell = client.GetCellsAsync(TestTableName, testKey).Result;
-                // make sure the cell is in the table
-                Assert.Equal(Encoding.UTF8.GetString(cell.Rows[0].Key.ToByteArray()), testKey);
-                // delete cell
-                client.DeleteCellsAsync(TestTableName, testKey).Wait();
-                // get cell again, 404 exception expected
-                client.GetCellsAsync(TestTableName, testKey).Wait();
+            client.StoreCellsAsync(TestTableName, set).Wait();
+            var cell = client.GetCellsAsync(TestTableName, testKey).Result;
+            // make sure the cell is in the table
+            Assert.Equal(Encoding.UTF8.GetString(cell.Rows[0].Key.ToByteArray()), testKey);
+            // delete cell
+            client.DeleteCellsAsync(TestTableName, testKey).Wait();
 
-                Assert.True(false);
-            }
-            catch (AggregateException e) when(e.InnerException is HttpRequestException hre && hre.Message.Contains("404"))
-            {
-            }
+            Assert.Null(await client.GetCellsAsync(TestTableName, testKey));
         }
 
         [Fact]

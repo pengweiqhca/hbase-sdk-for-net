@@ -43,9 +43,11 @@ namespace Microsoft.HBase.Client.Requester
                 PreAuthenticate = true,
             })
             {
-                BaseAddress = options.BaseUri,
-                Timeout = options.Timeout,
+                BaseAddress = options.BaseUri
             };
+
+            if (options.Timeout > TimeSpan.Zero)
+                _httpClient.Timeout = options.Timeout;
 
             _httpClient.DefaultRequestHeaders.Accept.TryParseAdd(contentType);
 

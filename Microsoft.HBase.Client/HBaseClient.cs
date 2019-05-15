@@ -313,7 +313,7 @@ namespace Microsoft.HBase.Client
 
             using (var webResponse = await GetRequestAsync(scannerInfo.TableName + "/scanner/" + scannerInfo.ScannerId, null).ConfigureAwait(false))
             {
-                return webResponse.WebResponse.StatusCode == HttpStatusCode.OK ? new MessageParser<CellSet>(() => new CellSet()).ParseFrom(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)) : null;
+                return webResponse.WebResponse.StatusCode == HttpStatusCode.OK ? Deserialize<CellSet>(await webResponse.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false)) : null;
             }
         }
 
@@ -327,7 +327,7 @@ namespace Microsoft.HBase.Client
             }
         }
 
-        private static T Deserialize<T>(Stream stream) where T : IMessage<T>, new() =>
+        private static T Deserialize<T>(Stream stream) where T : class, IMessage<T>, new() =>
             new MessageParser<T>(() => new T()).ParseFrom(stream);
 
         /// <summary>
@@ -420,20 +420,18 @@ namespace Microsoft.HBase.Client
             return _requester.IssueWebRequestAsync(endpoint, query, method, request?.ToByteArray());
         }
 
-        private async Task<T> GetRequestAndDeserializeAsync<T>(string endpoint, string query) where T : IMessage<T>, new()
+        private async Task<T> GetRequestAndDeserializeAsync<T>(string endpoint, string query) where T : class, IMessage<T>, new()
         {
             endpoint.ArgumentNotNull(nameof(endpoint));
 
             using (var response = await _requester.IssueWebRequestAsync(endpoint, query, HttpMethod.Get, null).ConfigureAwait(false))
             {
+                if (response.WebResponse.StatusCode == HttpStatusCode.NotFound) return null;
+
                 response.WebResponse.EnsureSuccessStatusCode();
 
                 using (var responseStream = await response.WebResponse.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                {
-                    var parser = new MessageParser<T>(() => new T());
-
-                    return parser.ParseFrom(responseStream);
-                }
+                    return Deserialize<T>(responseStream);
             }
         }
 

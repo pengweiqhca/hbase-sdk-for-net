@@ -8,8 +8,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Program.cs" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'" />
-
         <CodeAnalysisDictionary Include="..\FxCopCustomDictionary.xml">
             <Link>FxCopCustomDictionary.xml</Link>
         </CodeAnalysisDictionary>
@@ -17,7 +15,6 @@
         <ProjectReference Include="..\Microsoft.HBase.Client\Microsoft.HBase.Client.csproj" />
 
         <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">

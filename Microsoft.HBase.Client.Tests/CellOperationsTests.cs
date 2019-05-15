@@ -76,7 +76,7 @@ namespace Microsoft.HBase.Client.Tests
         }
 
         [Fact]
-        public void WhenIDeleteCellsWithTimeStampICanAddWithHigherTimestamp()
+        public async Task WhenIDeleteCellsWithTimeStampICanAddWithHigherTimestamp()
         {
             var client = GetClient();
 
@@ -85,15 +85,7 @@ namespace Microsoft.HBase.Client.Tests
 
             client.DeleteCellsAsync(_tableName, "1", ColumnFamilyName1, 10).Wait();
 
-            try
-            {
-                client.GetCellsAsync(_tableName, "1").Wait();
-                Assert.True(false, "Expected to throw an exception as the row is deleted");
-            }
-            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
-            {
-                exception.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "1") == null, "Expected to throw an exception as the row is deleted");
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("1", "c1", "1A", 11))).Wait();
 
@@ -105,7 +97,7 @@ namespace Microsoft.HBase.Client.Tests
 
         [Fact]
 
-        public void WhenIDeleteCellsWithTimeStampICannotAddWithLowerTimestamp()
+        public async Task WhenIDeleteCellsWithTimeStampICannotAddWithLowerTimestamp()
         {
             var client = GetClient();
 
@@ -114,32 +106,14 @@ namespace Microsoft.HBase.Client.Tests
 
             client.DeleteCellsAsync(_tableName, "2", ColumnFamilyName1, 10).Wait();
 
-            try
-            {
-                client.GetCellsAsync(_tableName, "2").Wait();
-                Assert.True(false, "Expected to throw an exception as the row is deleted");
-            }
-            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
-            {
-                exception.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "2") == null, "Expected to throw an exception as the row is deleted");
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("2", "c1", "1A", 9))).Wait();
 
-            try
-            {
-                client.GetCellsAsync(_tableName, "2").Wait();
-                Assert.True(false, "Expected to throw an exception as the row cannot be added with lower timestamp");
-            }
-            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
-            {
-                exception.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "2") == null, "Expected to throw an exception as the row cannot be added with lower timestamp");
         }
 
-
         [Fact]
-
         public async Task WhenICheckAndDeleteCellsWithTimeStampICannotAddWithLowerTimestampThanHbaseserver()
         {
             var client = GetClient();
@@ -158,30 +132,12 @@ namespace Microsoft.HBase.Client.Tests
             deleted = await client.CheckAndDeleteAsync(_tableName, GetCell("3", "c2", "1A", 10));
             deleted.ShouldEqual(true);
 
-            try
-            {
-                // All  cells are deleted so this should fail
-                await client.GetCellsAsync(_tableName, "3");
-                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
-            }
-            catch (HttpRequestException ex)
-            {
-                ex.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "3") == null, "expecting Get '3' to fail as all cells are removed");
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
-            try
-            {
-                await client.GetCellsAsync(_tableName, "3");
-                Assert.True(false, "Expected to throw an exception as the row cannot be added with lower timestamp than servers timestamp");
-            }
-            catch (HttpRequestException ex)
-            {
-                ex.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "3") == null, "Expected to throw an exception as the row cannot be added with lower timestamp");
         }
-
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
         [Fact]
@@ -200,29 +156,14 @@ namespace Microsoft.HBase.Client.Tests
 
             deleted.ShouldEqual(true);
 
-            try
-            {
-                // All  cells are deleted so this should fail
-                await client.GetCellsAsync(_tableName, "3");
-                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
-            }
-            catch (HttpRequestException ex)
-            {
-                ex.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "3") == null, "expecting Get '3' to fail as all cells are removed");
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
-            try
-            {
-                var retrievedCells = client.GetCellsAsync(_tableName, "3").Result;
-                retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
-                retrievedCells.Rows[0].Values[0].Column.ToStringUtf8().ShouldBeEqualOrdinalIgnoreCase("c1");
-            }
-            catch (AggregateException ex) when (ex.InnerException is HttpRequestException exception)
-            {
-                exception.Message.ShouldContain("404");
-            }
+            var retrievedCells = await client.GetCellsAsync(_tableName, "3");
+            Assert.NotNull(retrievedCells);
+            retrievedCells.Rows[0].Values.Count.ShouldEqual(1);
+            retrievedCells.Rows[0].Values[0].Column.ToStringUtf8().ShouldBeEqualOrdinalIgnoreCase("c1");
         }
 
         // These need fixes from https://issues.apache.org/jira/browse/HBASE-15323
@@ -242,16 +183,7 @@ namespace Microsoft.HBase.Client.Tests
 
             deleted.ShouldEqual(true);
 
-            try
-            {
-                // All  cells are deleted so this should fail
-                await client.GetCellsAsync(_tableName, "3");
-                Assert.True(false, "expecting Get '3' to fail as all cells are removed");
-            }
-            catch (HttpRequestException ex)
-            {
-                ex.Message.ShouldContain("404");
-            }
+            Assert.True(await client.GetCellsAsync(_tableName, "3") == null, "expecting Get '3' to fail as all cells are removed");
 
             client.StoreCellsAsync(_tableName, CreateCellSet(GetCellSet("3", "c1", "1B", 11))).Wait();
 
