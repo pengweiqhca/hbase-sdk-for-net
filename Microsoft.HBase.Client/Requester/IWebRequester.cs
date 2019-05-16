@@ -19,7 +19,7 @@ namespace Microsoft.HBase.Client.Requester
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    public interface IWebRequester : IDisposable
+    public interface IWebRequester
     {
         Task<Response> IssueWebRequestAsync(string endpoint, string query, HttpMethod method, byte[] input);
     }

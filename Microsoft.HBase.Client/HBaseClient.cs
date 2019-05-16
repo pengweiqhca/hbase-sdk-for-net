@@ -60,6 +60,8 @@ namespace Microsoft.HBase.Client
         /// </summary>
         private bool _disposed;
 
+        private readonly HttpMessageHandler _handler;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HBaseClient"/> class.
         /// </summary>
@@ -69,9 +71,23 @@ namespace Microsoft.HBase.Client
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            _requester = new WebRequester(options);
-        }
+            _handler = new HttpClientHandler { AllowAutoRedirect = false };
 
+            _requester = new WebRequester(_ => _handler, options);
+        }
+#if !NET45
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HBaseClient"/> class.
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="options">The global request options.</param>
+        public HBaseClient(IHttpMessageHandlerFactory factory, [NotNull] RequestOptions options)
+        {
+            if (options == null) throw new ArgumentNullException(nameof(options));
+
+            _requester = new WebRequester(factory.CreateHandler, options);
+        }
+#endif
         /// <summary>
         /// Creates a scanner on the server side.
         /// The resulting ScannerInformation can be used to read query the CellSets returned by this scanner in the #ScannerGetNext/Async method.
@@ -461,7 +477,8 @@ namespace Microsoft.HBase.Client
         {
             if (_disposed) return;
 
-            _requester?.Dispose();
+            _handler?.Dispose();
+
             _disposed = true;
         }
     }

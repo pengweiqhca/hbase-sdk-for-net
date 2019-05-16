@@ -21,41 +21,37 @@ namespace Microsoft.HBase.Client.Requester
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    /// <summary>
-    ///
-    /// </summary>
     public sealed class WebRequester : IWebRequester
     {
-        private readonly HttpClient _httpClient;
+        private readonly Func<HttpClient> _createHttpClient;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebRequester"/> class.
         /// </summary>
+        /// <param name="createHandler"></param>
         /// <param name="options"></param>
         /// <param name="contentType">Type of the content.</param>
-        public WebRequester(RequestOptions options, string contentType = "application/x-protobuf")
+        public WebRequester(Func<string, HttpMessageHandler> createHandler, RequestOptions options, string contentType = "application/x-protobuf")
         {
             options.Validate();
 
-            _httpClient = new HttpClient(new HttpClientHandler
+            _createHttpClient = () =>
             {
-                AllowAutoRedirect = false,
-                PreAuthenticate = true,
-            })
-            {
-                BaseAddress = options.BaseUri
+                var httpClient = new HttpClient(createHandler(GetType().FullName), false) { BaseAddress = options.BaseUri };
+
+                if (options.Timeout > TimeSpan.Zero)
+                    httpClient.Timeout = options.Timeout;
+
+                httpClient.DefaultRequestHeaders.Accept.TryParseAdd(contentType);
+
+                if (options.AdditionalHeaders != null)
+                    foreach (var kv in options.AdditionalHeaders)
+                    {
+                        httpClient.DefaultRequestHeaders.TryAddWithoutValidation(kv.Key, kv.Value);
+                    }
+
+                return httpClient;
             };
-
-            if (options.Timeout > TimeSpan.Zero)
-                _httpClient.Timeout = options.Timeout;
-
-            _httpClient.DefaultRequestHeaders.Accept.TryParseAdd(contentType);
-
-            if (options.AdditionalHeaders != null)
-                foreach (var kv in options.AdditionalHeaders)
-                {
-                    _httpClient.DefaultRequestHeaders.TryAddWithoutValidation(kv.Key, kv.Value);
-                }
         }
 
         /// <summary>
@@ -72,20 +68,15 @@ namespace Microsoft.HBase.Client.Requester
 
             using (var request = new HttpRequestMessage(method, string.IsNullOrEmpty(query) ? endpoint : $"{endpoint}?{query}"))
             {
-                if (input != null)
-                    request.Content = new ByteArrayContent(input) { Headers = { ContentType = _httpClient.DefaultRequestHeaders.Accept.First() } };
+                var client = _createHttpClient();
 
-                var response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+                if (input != null)
+                    request.Content = new ByteArrayContent(input) { Headers = { ContentType = client.DefaultRequestHeaders.Accept.First() } };
+
+                var response = await client.SendAsync(request).ConfigureAwait(false);
 
                 return new Response { WebResponse = response, RequestLatency = watch.Elapsed };
             }
-        }
-
-        public void Dispose()
-        {
-            _httpClient.Dispose();
-
-            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,17 +1,15 @@
-﻿namespace Microsoft.HBase.Client.Tests
-{
-    using Microsoft.HBase.Client.Tests.Utilities;
-    using System;
-    using System.Linq;
-    using System.Threading.Tasks;
-    using Xunit;
+﻿using Microsoft.HBase.Client.Tests.Utilities;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
 
+namespace Microsoft.HBase.Client.Tests
+{
     class Program
     {
         static async Task Main()
         {
-            await new CellOperationsTests().WhenICheckAndDeleteCellsWithTimeStampAndCellsToDeleteICanAddWithHigherTimestamp();
-
             foreach (var testClass in typeof(Program).Assembly.GetTypes())
                 foreach (var testMethod in testClass.GetMethods().Where(m => m.GetCustomAttributesData()
                     .Any(attr => attr.AttributeType == typeof(FactAttribute))))
@@ -25,7 +23,7 @@
 
                         Console.WriteLine($"{DateTime.Now:HH:mm:ss.fff} {testClass.Name}.{testMethod.Name}");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
 
