@@ -21,7 +21,7 @@ namespace Microsoft.HBase.Client
 
     public class RequestOptions
     {
-        public TimeSpan Timeout { get; set; }
+        public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
         public Dictionary<string, string> AdditionalHeaders { get; set; }
         public Uri BaseUri { get; set; }
 
